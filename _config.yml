@@ -11,6 +11,10 @@ language: zh-Hans
 timezone:
 avatar: /images/avatar.png
 
+
+duoshuo_shortname: muxiaocao
+tencent_analytics: 58122117
+
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: http://yoursite.com
