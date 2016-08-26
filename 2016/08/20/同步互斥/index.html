@@ -1,0 +1,803 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="锁 ReentrantLock AQS 并发包" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="互斥同步（Mutual Exclusion &amp;amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面">
+<meta property="og:type" content="article">
+<meta property="og:title" content="漫谈Java中的互斥同步">
+<meta property="og:url" content="http://yoursite.com/2016/08/20/同步互斥/index.html">
+<meta property="og:site_name" content="ITBoy | 木小草">
+<meta property="og:description" content="互斥同步（Mutual Exclusion &amp;amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面">
+<meta property="og:image" content="http://img.blog.csdn.net/20160824210012602">
+<meta property="og:image" content="http://i.imgur.com/IFaPqhT.png">
+<meta property="og:image" content="http://img.blog.csdn.net/20160824205945492">
+<meta property="og:image" content="http://img.blog.csdn.net/20160824205855379">
+<meta property="og:image" content="http://img.blog.csdn.net/20160824205819596">
+<meta property="og:image" content="http://img.blog.csdn.net/20160824205752023">
+<meta property="og:image" content="http://cdn1.infoqstatic.com/statics_s1_20160823-0357/resource/articles/ConcurrentHashMap/zh/resources/1.jpg">
+<meta property="og:image" content="http://incdn1.b0.upaiyun.com/2015/04/e0ca25b9783714fcf8c69f56befb643d.png">
+<meta property="og:image" content="http://img.blog.csdn.net/20160824205606343">
+<meta property="og:updated_time" content="2016-08-26T04:57:29.133Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="漫谈Java中的互斥同步">
+<meta name="twitter:description" content="互斥同步（Mutual Exclusion &amp;amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160824210012602">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/08/20/同步互斥/"/>
+
+  <title> 漫谈Java中的互斥同步 | ITBoy | 木小草 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ITBoy | 木小草</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">求知若饥，虚心若愚。（Stay hungry. Stay foolish.）</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                漫谈Java中的互斥同步
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-20T00:00:00+08:00" content="2016-08-20">
+              2016-08-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Java编程/" itemprop="url" rel="index">
+                    <span itemprop="name">Java编程</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>互斥同步（Mutual Exclusion &amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面，互斥是因，同步是果，互斥是方法，同步是目的。———《深入理解JAVA虚拟机》</p>
+</blockquote>
+<h1 id="一、从sychronized到ReentrantLock"><a href="#一、从sychronized到ReentrantLock" class="headerlink" title="一、从sychronized到ReentrantLock"></a>一、从sychronized到ReentrantLock</h1><blockquote>
+<p>Java代码在编译之后会变成Java字节码，字节码被类加载器加载到JVM里，JVM执行字节码，最终需要转化为汇编指令在CPU上执行，JAVA中所使用的并发机制依赖于JVM的实现和CPU的指令。——《Java并发编程的艺术》</p>
+</blockquote>
+<h2 id="1-1-重量级，阻塞同步：sychronized"><a href="#1-1-重量级，阻塞同步：sychronized" class="headerlink" title="1.1 重量级，阻塞同步：sychronized"></a>1.1 重量级，阻塞同步：sychronized</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">public V put(K key, V value) &#123;</div><div class="line">    synchronized (mutex) &#123;</div><div class="line">         return m.put(key, value);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>下面是以上代码的字节码信息（javap查看）：</p>
+<p><img src="http://img.blog.csdn.net/20160824210012602" alt="这里写图片描述"></p>
+<blockquote>
+<p>sychronized关键字是java中最基本的互斥同步手段，大括号中的部分就是加锁的同步块，而mutex参数，便是锁对象了。从JVM规范中可以看到Synchonized在JVM理的实现原理，JVM基于进入和退出Monitor对象来实现方法同步和代码块同步的。另外，Synchroized用的锁是存在Java对象Mark Word里的。任何一个对象都有一个monitor与之关联，当且一个monitor被持有只有，它将处于锁定状态。</p>
+<p>根据虚拟机规范的要求，在执行monitorenter指令时，首先要去常事获取对象的锁。如果这个对象没被锁定，或者当前线程已经拥有了那个对象的锁，把锁的计数器+1，相应地，在执行monitorexit指令时会将锁计数器减一，当计数器为0时，锁就被释放了。如果获取对象锁失败了，那当前线程就要阻塞等待，知道对象锁被另外一个线程释放终止。</p>
+<p>以上是《深入理解JAVA虚拟机》中的原文，从中可以看出，monitorenter就是操作系统中的P操作，而monitorexit则是V操作。而sychronized就是保证共享代码段或者数据段的PV操作指令集。但值得注意的是，当获取锁失败之后，当前线程会阻塞等待，这就涉及到了线程的切换了，是需要操作系统核心态去完成的。这就将大量的资源耗费在了线程切换上了，这也是sychronized属于重量级（Heavyweight）操作的原因了。 </p>
+</blockquote>
+<h2 id="1-2-原子操作：CAS"><a href="#1-2-原子操作：CAS" class="headerlink" title="1.2 原子操作：CAS"></a>1.2 原子操作：CAS</h2><blockquote>
+<p>互斥同步最主要的问题就是进行线程阻塞和唤醒所带来的性能问题，因此这种同步也被称为阻塞同步（Blocking Synchronization）。另外，它属于一种悲观的并发策略，无论共享数据是否真的会出现竞争，它都进行加锁、用户态核心态的转换、维护锁计数器和检查是否被阻塞的线程需要被唤醒等操作。</p>
+<p>了解了操作系统的pv操作，我们可以很清楚的知道，之所以pv操作可以实现锁的互斥功能，达到同步效果，是因为PV两个操作是原子性的。那么编程语言的底层其实是运行在硬件上的处理器指令集，具备从语意上看起来需要多次操作的行为只通过一条处理器指令就能完成的指令常用的有：</p>
+</blockquote>
+<ul>
+<li>[ ] 测试并设置（Test-and-Set）；</li>
+<li>[ ] 获取并增加（Fetch-and-Increment）； </li>
+<li>[ ] 交换（Swap）；</li>
+<li>[x] 比较并交换（Compare-and-Swap，简称CAS）；</li>
+<li>[x] 加载链接/条件存储（Load-Linked/Store-Conditional，简称LL/SC）。</li>
+</ul>
+<blockquote>
+<p>前三条指令是上个世纪就已经存在于大多数指令集之中的处理器指令。后面两条打勾的指令是现代处理器新增的，而且这两条指令的目的和功能是相似的。在IA64、x86指令集中通过cmpxchg指令完成CAS功能，在sparc-TSO中也有casa指令实现，而在ARM和PowerPC架构下，则需要使用一对Idre/strex指令来完成LL/SC的功能。</p>
+<p>那么，处理器是如何实现原子操作的呢？首先我们先看一下什么叫缓冲行（cache line）。</p>
+<p>“缓冲中可以分配的最小存储单位。处理器填写缓存线时会加载整个缓存线，需要使用多个主内存读周期。”这是对缓冲行的官方定义。从定义中我们可以看出，既然是最小存储单位，那么必然是原子性的，它也是每个线程读取主存变量的必要阶段。</p>
+<p>32为IA-32处理器使用基于对缓存加锁或者总线加锁的方式来实现多处理器之间的原子操作。首先处理器会自动保存基本的内存操作的原子性。处理器保证从系统内存中读取或者写入一个字节是原子的，意思是当一个处理器夺取一个字节时，其他处理器不能访问这个字节的内存地址。Pentium6和最新的处理器能自动保存但处理器对同一个缓存行里进行16/32/64位的操作是原子的，但复杂的内存操作处理器是不能自动保证其原子性的，如果跨总线宽度、跨多个缓存行和跨页表的访问。但是，处理器提供总线锁定和缓存锁定两个机制来保证复杂内存操作的原子性。</p>
+<p>正是因为原子性的指令集的发展，Java才有了另一种并发策略就是，基于冲突检测的乐观并发策略。简单的说就是先进行操作，如果有其他线程争用则进行其他的补偿措施，一般的补偿就是不断的重试，知道成功。那么在没有并发冲突的时候，其实是没有锁的。这很大程度上节省了锁的开支，另外线程也没有了阻塞等待，减少了大量的时间。这种乐观的并发策略称为非阻塞同步（Non-Blocking Synchronization）。那么下面我们来看一下Java是如何利用CAS原子操作的。</p>
+</blockquote>
+<h2 id="1-3-Java提供原子操作的Unsafe类"><a href="#1-3-Java提供原子操作的Unsafe类" class="headerlink" title="1.3 Java提供原子操作的Unsafe类"></a>1.3 Java提供原子操作的Unsafe类</h2><blockquote>
+<p>在JDK1.5之后，Java程序中才可以使用CAS操作，该操作由sun.misc.Unsafe类封装。<br>另外该类属于比较底层的操作，并不提供给用户程序调用。<code>Unsafe.getUnsafe()</code>的代码中限制了只有启动类加载器（Bootstrap ClassLoader）加载的Class才能访问它，如果不采取反射手段，我们只能通过其他的Java API来间接获得它。<br>首先我们先看一下Unsafe的部分源码。Unsafe全部的源码<a href="http://www.docjar.com/html/api/sun/misc/Unsafe.java.html" target="_blank" rel="external">请点击</a>。</p>
+</blockquote>
+<p><img src="http://i.imgur.com/IFaPqhT.png" alt=""><br><img src="http://img.blog.csdn.net/20160824205945492" alt="这里写图片描述"></p>
+<blockquote>
+<p>可以看到它们均是本地方法，其中objectFieldOffset方法，是通过一个属性对象得到在内存中相对于Object对象的偏移量。另外，三个compareAnd*方法，底层均是调用了CAS原子操作，其中CAS操作其实是需要三个参数的，分别是内存地址、旧的预期值和新的值。内存地址是会通过Object对象计算出Object的内存首地址，然后加上offset的偏移地址。CAS指令执行时，当且仅当内存地址内的值和旧址相等时，才将内存中的值替换为新的值。整个过程是保证原则性的。</p>
+<p>我们可以看一看AbstractQueuedSynchronizer是如何实现调用CAS操作的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">* Head of the wait queue, lazily initialized.  Except for</div><div class="line">* initialization, it is modified only via method setHead.  Note:</div><div class="line">* If head exists, its waitStatus is guaranteed not to be</div><div class="line">* CANCELLED.</div><div class="line">*/</div><div class="line"><span class="keyword">private</span> <span class="keyword">transient</span> <span class="keyword">volatile</span> Node head;<span class="comment">//需要保证原子操作的属性</span></div><div class="line">...</div><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> headOffset;<span class="comment">//记录head的对象内偏移量</span></div><div class="line"><span class="keyword">static</span> &#123;</div><div class="line">   <span class="keyword">try</span> &#123;</div><div class="line">       ...</div><div class="line">       <span class="comment">// 在对象初始化的时候，通过unsage的objectFieldOffset计算出属性的偏移量</span></div><div class="line">       headOffset = unsafe.objectFieldOffset</div><div class="line">           (AbstractQueuedSynchronizer.class.getDeclaredField(<span class="string">"head"</span>));</div><div class="line">       ...</div><div class="line">   &#125; <span class="keyword">catch</span> (Exception ex) &#123; <span class="keyword">throw</span> <span class="keyword">new</span> Error(ex); &#125;</div><div class="line">&#125;</div><div class="line">...</div><div class="line"><span class="comment">/**</span></div><div class="line">* CAS head field. Used only by enq.</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">compareAndSetHead</span><span class="params">(Node update)</span> </span>&#123;</div><div class="line">   <span class="comment">// 调用unsafe的CAS操作，内部会根据this对象和偏移量计算出内存真实地址</span></div><div class="line">   <span class="keyword">return</span> unsafe.compareAndSwapObject(<span class="keyword">this</span>, headOffset, <span class="keyword">null</span>, update);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>细心的读者可能会疑问，CAS操作具有原子性，怎么保证Unsafe到CAS操作的调用过程也具有原子性呢？</p>
+<p>其实这几个重要的方法(类似的方法还有Math.sin())被虚拟机做了特殊处理，即使编译出的结果就是一条平台相关的处理器CAS指令，没有方法调用的过程，或者可以认为是无条件的内联进去了。这种特殊处理的方法叫做——固有函数（Intrinsics）。</p>
+</blockquote>
+<h2 id="1-3-Unsafe之上的非阻塞同步实现"><a href="#1-3-Unsafe之上的非阻塞同步实现" class="headerlink" title="1.3 Unsafe之上的非阻塞同步实现"></a>1.3 Unsafe之上的非阻塞同步实现</h2><blockquote>
+<p>至此，利用CAS操作，就可以在很多情况下简单高效地替代sychronized。比如，java.util.concurrent.atomic下的很多原子性变量，就可以实现变量有关的同步了。下面举个《深入理解JAVA虚拟机》中的例子，代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Atomic 变量自增运算测试</div><div class="line"> * AtomicTest.java</div><div class="line"> * <span class="doctag">@time</span> 2016年8月19日</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AtomicTest</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> AtomicInteger race = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">increase</span><span class="params">()</span> </span>&#123;</div><div class="line">		race.incrementAndGet();</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> THREADS_COUNT = <span class="number">20</span>;</div><div class="line">	</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		Thread[] threads = <span class="keyword">new</span> Thread[THREADS_COUNT];</div><div class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threads.length; i++) &#123;</div><div class="line">			threads[i] = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">				</div><div class="line">				<span class="meta">@Override</span></div><div class="line">				<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">					<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">10000</span>; j++) &#123;</div><div class="line">						increase();</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">			&#125;);</div><div class="line">			threads[i].start();</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		<span class="keyword">while</span> (Thread.activeCount() &gt; <span class="number">1</span>) &#123;</div><div class="line">			Thread.yield();</div><div class="line">		&#125;</div><div class="line">		System.out.println(race);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>运行结果如下：200000。 如果将AtomicInteger换成int，输出的结果就不唯一了。这一切都归功于incrementAndGet（）方法的原子性。它的实现其实非常简单，原代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Atomically increments by one the current value.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@return</span> the updated value</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">incrementAndGet</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">for</span> (;;) &#123;</div><div class="line">        <span class="keyword">int</span> current = get();</div><div class="line">        <span class="keyword">int</span> next = current + <span class="number">1</span>;</div><div class="line">        <span class="keyword">if</span> (compareAndSet(current, next))</div><div class="line">            <span class="keyword">return</span> next;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这就是一个简单的非阻塞同步的应用场景。改方法在无限循环中，不断尝试if语句中的compareAndSet方法，很显然该方法内就是调用的Unsafe中的CAS操作,其内部会有一个int属性专门存放保存的数据。在调用CAS操作前，先获取到旧值，然后计算出加一后的新值，并将该对象和实现算好的属性偏移量，外加旧值、新值一并传递给CAS操作。如果成功则返回新值，否则继续操作。</p>
+<p>值得注意的是，我们熟悉的volatile并不具有操作的原子性，它只是保证了我们volatile的数据是最新的。另外CAS看起来很美，其实也是有缺陷的：</p>
+<ol>
+<li>它无法避免”ABA”问题。尽管”ABA”问题很多情况下并会显现出来。</li>
+<li>循环时间长开销大。解决办法很有多，可以使用回旋或者自回旋减少尝试时间。如果JVM能支持处理器提供的pause指令，也可以提升一下效率。</li>
+<li>只能保证一个共享变量的原子操作。原因是CAS只是对于一个变量的原子操作，但是从Java1.5开始，JDK提供了AtomicReference类来保证引用对象之间的原子性，那么我们就可以把多个变量放在一个类里面，对这个类进行CAS操作了。</li>
+</ol>
+</blockquote>
+<h2 id="1-4-volatile的定义与实现"><a href="#1-4-volatile的定义与实现" class="headerlink" title="1.4 volatile的定义与实现"></a>1.4 volatile的定义与实现</h2><blockquote>
+<p>Java语言规范第三版中的对volatile的定义如下：Java编译语言允许线程访问共享变量，为了确保共享变量能被准确和一致地更新，线程应该确保通过排它锁单独获得这个变量。</p>
+<p>从微观上讲，volatile只是在不同线程之间提供了变量可见性（一个线程对主存变量写，都会被其他线程所看到），从而实现一致性的效果。从宏观上讲，正是因为volatile和CAS操作，才有了现在的包。可以说，volatile和CAS操作，是现代并发包的基石。</p>
+<p>那么volatile是如何来保证可见性的呢？根据《JAVA并发编程的艺术》中的描述，<code>instance = new Singleton(); //instance是volatile变量</code>这句Java代码会转变成汇编代码如下：<br><code>0x01a3de1d: movb $0x0,0x1104800(%esi);0x01a3de24:lock add1 $0x0,(%esp);</code><br>通过IA-32架构软件开发者手册可知，Lock前缀的指令在多核处理器下会引发两件事情：</p>
+</blockquote>
+<ol>
+<li>将当前处理器缓存行的数据协会到系统内存。</li>
+<li>这个协会内存的操作会使在其他CPU里缓存了该内存地址的数据无效。</li>
+</ol>
+<blockquote>
+<p>从Java内存模型（JMM）角度考虑，volatile写-读建立的是happens-defore关系，会在编译器在生成字节码时，在指令序列中插入内存屏障来禁止特定类型的处理器重排序，达到happens-defore的内存语义。为此，JMM采取保守策略，下面是基于保守策略的JMM内存屏障插入策略：</p>
+</blockquote>
+<ul>
+<li>[ ] 在每个volatile写操作的前面插入一个StoreStore屏障。</li>
+<li>[ ] 在每个volatile写操作的后面插入一个StoreLoad屏障。</li>
+<li>[ ] 在每个volatile读操作的后面插入一个LoadLoad屏障。</li>
+<li>[ ] 在每个volatile读操作的后面插入一个LoadLoad屏障。</li>
+</ul>
+<blockquote>
+<p>所以，volatile的两个特性：单步原子性，可见性。其中单步原子性是通过在字节码中加入特殊指令，使用内存屏障在实现禁止一些处理器重排从而达到的。而可见性，也是通过在字节码中加入一个Lock前缀指令，实现将使用该变量的其他线程中的缓存行失效，使其必须从内存中读，从而达到的。</p>
+</blockquote>
+<p><strong>注：</strong>具体的JMM处理，详见<a href="http://www.infoq.com/cn/articles/java-memory-model-4/" target="_blank" rel="external">关于volatile的Java内存模型</a></p>
+<h2 id="1-5-ReentrantLock锁的实现"><a href="#1-5-ReentrantLock锁的实现" class="headerlink" title="1.5 ReentrantLock锁的实现"></a>1.5 ReentrantLock锁的实现</h2><blockquote>
+<p>提到ReentrantLock，就不得不提到Doug Lea。<br>“如果IT的历史，是以人为主体串接起来的话，那么肯定少不了Doug Lea。这个鼻梁挂着眼镜，留着德王威廉二世的胡子，脸上永远挂着谦逊腼腆笑容，服务于纽约州立大学Oswego分校计算机科学系的老大爷。” 这是百度百科对他的描述。他便是Java并发包（util.concurrent，简称J.U.C）的作者。</p>
+<p>在Java并发包中，我们可以看见大量volatile修饰的变量和Unsafe的原子性操作CAS。可以说正是因为这两项技术的成熟，才成就了Doug Lea的并发包。</p>
+<p>在基本用法上，ReentranLock与synchronized很相似，他们都具备一样的线程重入特性，只是代码上有点区别，一个表现为API层面的互斥锁（lock（）和unlock方法配合try/finally语句块来完成），一个表现为原生语法层面的互斥锁。不过ReentrantLock比synchronized增加了一些高级功能，主要有以下三项：等待可中断、可实现公平锁，一级锁可以绑定多个条件。</p>
+</blockquote>
+<ul>
+<li>[ ] 等待可中断是指当持有锁的线程长期不是放锁的时候，正在等待的线程可以选择放弃等待，改为处理其他事情，可中断特性对处理执行时间非常长的同步块很有帮助。</li>
+<li>[ ] 公平锁是指多个线程在等待同一锁时，必须按照申请锁的时间顺序来依次获得锁；而非公平锁则不保证这一点，在锁被释放的时，任何一个等待锁的线程都有机会获得锁。synchronized中的锁是非公平的，ReentrantLock默认情况下也是非公平的，但可以通过带布尔值的构造函数要求使用公平锁。</li>
+<li>[ ] 锁绑定多个条件是指一个ReentrantLock对象可以同时绑定多个Condition对象，而在sychronized中，锁对象的wait（）和notify（）或notifyAll（）方法可以实现一个隐含的条件，如果要和多余一个的条件关联的时候，就不得不额外地添加一个锁，而ReentrantLock则无须这样做，只需要多次调用newCondition（）方法即可。</li>
+</ul>
+<h3 id="1-5-1-ReentrantLock的结构"><a href="#1-5-1-ReentrantLock的结构" class="headerlink" title="1.5.1 ReentrantLock的结构"></a>1.5.1 ReentrantLock的结构</h3><blockquote>
+<p>ReentrantLock的实现依赖于Java同步器框架AbstractQueueSynchronizer（简称AQS）。AQS使用一个整形的volatile变量（命名为state）来维护同步状态，这个volatile变量是ReentrantLock锁实现的关键。下面我们先看一下ReentrantLock的类结构：</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20160824205855379" alt="这里写图片描述"><br><strong>ReentrantLock的类图</strong></p>
+<h3 id="1-5-2-公平锁-FairSync"><a href="#1-5-2-公平锁-FairSync" class="headerlink" title="1.5.2 公平锁-FairSync"></a>1.5.2 公平锁-FairSync</h3><blockquote>
+<p>ReentrantLock分为公平锁和非公平锁，我们首先分析公平锁。<br>使用公平锁时，加锁方法lock()调用轨迹如下：<br>1) ReentrantLock：lock().<br>2) FairSync:lock().<br>3) FairSync:acquire(int arg).<br>4) FairSync:tryAcquire(int arg).<br>在第四步真正开始加锁，下面是该方法的源代码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * Fair version of tryAcquire.  Don&apos;t grant access unless</div><div class="line"> * recursive call or no waiters or is first.</div><div class="line"> */</div><div class="line">protected final boolean tryAcquire(int acquires) &#123;</div><div class="line">    final Thread current = Thread.currentThread();</div><div class="line">    int c = getState();</div><div class="line">    // 判断临界区的情况</div><div class="line">    if (c == 0) &#123;</div><div class="line">        // 判断当前线程是否在队首</div><div class="line">        if (!hasQueuedPredecessors() &amp;&amp;</div><div class="line">            compareAndSetState(0, acquires)) &#123;</div><div class="line">            // 如果在队首，就立即使用unsafe的CAS操作将state置为acquire</div><div class="line">            // 并将拥有线程置为当前线程</div><div class="line">            setExclusiveOwnerThread(current);</div><div class="line">            return true;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    else if (current == getExclusiveOwnerThread()) &#123;</div><div class="line">    // 如果当前线程仍然是拥有线程，表示该线程是拥有锁的</div><div class="line">        int nextc = c + acquires;</div><div class="line">        if (nextc &lt; 0)</div><div class="line">            throw new Error(&quot;Maximum lock count exceeded&quot;);</div><div class="line">        // 直接修改state，并返回true</div><div class="line">        setState(nextc);</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">    return false;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以上代码可以看出中调用的方法其实都是ASQ中提供的方法，所以具体实现其实是同步器ASQ来实现的，不过从该方法中我们可以看到，整个过程其实就是在维护ASQ中的State整型变量。</p>
+<p>state相当于操作系统中的互斥变量mutex。当state等于0时，表示当前没有线程在临界区，此时可以进入临界区。为了保证公平，ASQ需要判断当前等待队列中的第一个线程是否是当前线程，如果是才会允许进入（hasQueuedPredecessors()方法）。进入之后有两步操作，第一是使用CAS操作将state置为参数acquires，该参数表示当前占用的临近资源数，第二是将ASQ中的exclusiveOwnerThread置为当前线程，用于记录临界区中的占用线程。</p>
+<p>当state不等于0，而临界区中的占用线程是当前线程，表示该线程是再次进入临界区，则需要将占用资源数增加acquire。另外，根据第三步如果第四步以上两个条件均不满足，则将此线程加入等待队列并阻塞。第三步的源代码和整体流程图如下：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</div><div class="line">    <span class="comment">// 如果没有获取锁并且已经加入了等待队列，则就阻塞自己</span></div><div class="line">    <span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp;</div><div class="line">        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</div><div class="line">        selfInterrupt();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">st=&gt;start: 开始</div><div class="line">op1=&gt;operation: 获得当前线程current</div><div class="line">op2=&gt;operation: 获得ASQ的state</div><div class="line">cond=&gt;condition: state是否为0</div><div class="line">queue=&gt;condition:  current是否在队首</div><div class="line">cas=&gt;condition: CAS操作state</div><div class="line">setThread=&gt;operation: 设置拥有线程</div><div class="line">endTrue=&gt;end: 返回true</div><div class="line">endFalse=&gt;operation: 返回false</div><div class="line"></div><div class="line">condThread=&gt;condition: current是否已拥有</div><div class="line">op3=&gt;operation: 计算并更新state</div><div class="line">op4=&gt;condition: 加入等待队列并阻塞</div><div class="line">weakup=&gt;operation: 被唤醒</div><div class="line">wait=&gt;operation: 等待唤醒</div><div class="line"></div><div class="line">end=&gt;end: 结束</div><div class="line"></div><div class="line">st-&gt;op1-&gt;op2-&gt;cond</div><div class="line">cond(yes)-&gt;queue</div><div class="line">queue(yes)-&gt;cas</div><div class="line">queue(no)-&gt;condThread</div><div class="line">cond(no)-&gt;condThread</div><div class="line">cas(no)-&gt;condThread</div><div class="line">condThread(yes)-&gt;op3-&gt;endTrue</div><div class="line">condThread(no)-&gt;endFalse-&gt;op4</div><div class="line">cas(yes)-&gt;setThread</div><div class="line">setThread-&gt;endTrue-&gt;end</div><div class="line">op4(yes)-&gt;wait-&gt;end</div><div class="line">op4(no)-&gt;weakup-&gt;op1</div></pre></td></tr></table></figure>
+<blockquote>
+<p>在使用公平锁时，解锁方法unlock()调用轨迹如下：<br>1) ReentrantLock:unlock().<br>2) AbstractQueueSynchronizer:release(int arg).<br>3) AbstractQueueSynchronizer:tyrRelease(int releases).<br>在第三步真正开始释放所，下面是该方法的源代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryRelease</span><span class="params">(<span class="keyword">int</span> releases)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> c = getState() - releases;</div><div class="line">    <span class="keyword">if</span> (Thread.currentThread() != getExclusiveOwnerThread())</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalMonitorStateException();</div><div class="line">    <span class="comment">// 该返回值是用于第三步，以此来判断是否需要唤醒等待队列的线程</span></div><div class="line">    <span class="keyword">boolean</span> free = <span class="keyword">false</span>;</div><div class="line">    <span class="keyword">if</span> (c == <span class="number">0</span>) &#123;</div><div class="line">        free = <span class="keyword">true</span>;</div><div class="line">        setExclusiveOwnerThread(<span class="keyword">null</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 释放锁的最后，更新volatile变量state</span></div><div class="line">    setState(c);</div><div class="line">    <span class="keyword">return</span> free;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从上面的源代码可以看出，在释放锁的最后更行了volatile变量state。在获取锁时，首先读这个volatile变量。根据volatile的happens-before规则，释放锁的线程在更新volatile变量之前可见的共享变量，在获取锁的线程读取同一个volatile变量后将立即变得对获取锁的线程可见。根本原因是，volatile本更新之后，处理器会通知所有使用该变量的线程（嗅探方式），使得他们的缓存行失效，只能从主存中读取volatile变量，并进行缓存行填充。</p>
+<p>另外，如果该方法返回的是ture，即c为0，表示此时没有线程拥有此锁，需要将AQS拥有线程置为null唤醒等待队列的线程。而如果是false，该线程还没有完全释放完所有的锁。此逻辑是在第二步实现的，具体源代码和流程图如下：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">release</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (tryRelease(arg)) &#123;</div><div class="line">        Node h = head;</div><div class="line">        <span class="comment">// 判断等待队列中是否还有在等待唤醒的线程</span></div><div class="line">        <span class="keyword">if</span> (h != <span class="keyword">null</span> &amp;&amp; h.waitStatus != <span class="number">0</span>)</div><div class="line">            <span class="comment">// 此方法最终调用的是Unsafe的unpark(Thread)方法，用于唤醒一个线程。</span></div><div class="line">            unparkSuccessor(h);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">st=&gt;start: 开始</div><div class="line">getState=&gt;operation: 计算最新的state(c)</div><div class="line">updateOwner=&gt;operation: 拥有线程置为null</div><div class="line">updateState=&gt;operation: 更新AQS的state</div><div class="line"></div><div class="line">conC=&gt;condition: c==0</div><div class="line"></div><div class="line">returnTrue=&gt;operation: 返回true</div><div class="line">returnFalse=&gt;operation: 返回false</div><div class="line">unpark=&gt;operation: 唤醒等待线程</div><div class="line"></div><div class="line">end=&gt;end: 结束</div><div class="line">st-&gt;getState-&gt;conC-&gt;updateState-&gt;end</div><div class="line">conC(yes)-&gt;updateOwner-&gt;returnTrue-&gt;unpark-&gt;end</div><div class="line">conC(no)-&gt;updateState-&gt;returnFalse-&gt;end</div></pre></td></tr></table></figure>
+<h3 id="1-5-3-同步器AbstractQueuedSynchronizer"><a href="#1-5-3-同步器AbstractQueuedSynchronizer" class="headerlink" title="1.5.3 同步器AbstractQueuedSynchronizer"></a>1.5.3 同步器AbstractQueuedSynchronizer</h3><blockquote>
+<p>通过ReentrantLock的公平锁可以看出，同步是靠AbstractQueuedSynchronizer类来实现的。</p>
+<ol>
+<li><p>ASQ在初始化的时候，会初始化得到unsafe对象，为一些关键步骤提供原子性操作，保证同步。</p>
+</li>
+<li><p>ASQ维护了一个volatile变量state来表示锁的状态，对state的操作和线程的唤醒使用了unsafe中的本地方法来保证原子性和异步性。</p>
+</li>
+<li><p>AQS的等待队列是采用了一个基于FIFO的双向链表（简称sync队列），每个节点为位内部类Node，其中有五个重要的成员分别表示等待状态、前驱、后继、存储condition队列中的后继节点、入队列时的当前线程。他们均为volatile修饰。<br>节点成为sync队列和condition队列构建的基础，在同步器中就包含了sync队列。并且拥有三个成员变量来维护这个队列：sync队列的头节点head、sync队列的尾节点tail和状态state。</p>
+</li>
+<li><p>AQS的内部类Condition，实现一个Lock可以绑定多个条件。其中每个condition对象维护一个FIFO的条件队列，并有该队列的头尾节点。所以说，一个同步器拥有一个同步队列和多个等待队列。如果所示：</p>
+</li>
+</ol>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20160824205819596" alt="这里写图片描述"></p>
+<p><strong>注：</strong>关于AbstractQueuedSynchronizer详细的介绍和原理分析，<a href="http://ifeve.com/introduce-abstractqueuedsynchronizer/" target="_blank" rel="external">请点击这里</a>。<br>另外，《JAVA并发编程的艺术》中的第五章详细的描述了ASQ各种API和实现原理。</p>
+<h3 id="1-5-4-总结"><a href="#1-5-4-总结" class="headerlink" title="1.5.4 总结"></a>1.5.4 总结</h3><blockquote>
+<p>由于Java的CAS同事具有volatile读和colatile写的内存语义，因此Java线程之间的通信现在有了下面4中方式。</p>
+<ol>
+<li><p>A线程写volatile变量，随后B线程读这个volatile变量。</p>
+</li>
+<li><p>A线程写volatile变量，随后B线程用CAS更新这个volatile变量。</p>
+</li>
+<li><p>A线程用CAS更新一个volatile变量，随后B线程用CAS更新这个volatile变量。</p>
+</li>
+<li><p>A线程用CAS更新一个volatile变量，随后B线程读这个volatile变量。</p>
+</li>
+</ol>
+<p>Java的CAS会使用现代处理器上提供的高效机器级别的原子指令，这些原子指令以原子方式对内存执行读-改-写操作，这是在多处理器中实现同步的关键（本质上来说，能够支持原子性读-改-写指令的计算机，是顺序计算图灵机的异步等价机器，因此任何现代的多处理器都会支持某种能对内存执行原子性读-改-写操作的原子指令）。同事，volatile变量的读/写和CAS可以实现线程之间的通信。把这些特性整合在一起，就形成了整个concurrent包得以实现的基石。如果我们仔细分析concurrent包的源代码实现，会发现一个通用化的实现模式。<br>    首先，声明共享变量volatile。<br>    然后，使用CAS的原子条件更新来实现线程之间的同步。<br>    同时，配合以volatile的读/写和CAS所具有的volatile读和写的内存语义来实现线程之间的通信。</p>
+<p>AQS,非阻塞数据结构和原子变量类（java.util.concurrent.atomic包中的类），这些concurrent包中的基础类都是使用这种模式来实现的，而concurrent包中的高层类又是依赖于这些基础类来实现的。从整体来看，concurrent包的实现示意图如下：</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20160824205752023" alt="这里写图片描述"></p>
+<h1 id="二、从ReentrantLock到ConcurrentHashMap"><a href="#二、从ReentrantLock到ConcurrentHashMap" class="headerlink" title="二、从ReentrantLock到ConcurrentHashMap"></a>二、从ReentrantLock到ConcurrentHashMap</h1><blockquote>
+<p>Java程序员进行并发编程时，相比于其他语言的程序员而言要倍感幸福，因为并发编程大师Doug Lea不遗余力地为Java开发者提供了非常多的并发容易和框架。接下来我们就以ConcurrentHashMap为例，见识一下大师的功力。</p>
+</blockquote>
+<h2 id="2-1-ConcurrentHashMap的结构"><a href="#2-1-ConcurrentHashMap的结构" class="headerlink" title="2.1 ConcurrentHashMap的结构"></a>2.1 ConcurrentHashMap的结构</h2><blockquote>
+<p>ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成。而Segment就是ReentrantLock，在ConcurrentHashMap里扮演者锁的角色；HashEntry则用于存储键值对数据。一个ConcurrentHashMap里包含一个Segment数组。Segment的结构和HashMap类似，是一种数组和链表结构。一个Segment里面包含一个HashEntry数组，每个HashEntry是一个链表结构的元素，每个Segment守护着一个HashEntry数组里的元素，当对HashEntry数组的数据进行修改时，必须首先获得与它对应的Segment锁。具体的类图和结构图如下：<br>类图：<br><img src="http://cdn1.infoqstatic.com/statics_s1_20160823-0357/resource/articles/ConcurrentHashMap/zh/resources/1.jpg" alt="ConcurrentHashMap类图"><br>结构图：<br><img src="http://incdn1.b0.upaiyun.com/2015/04/e0ca25b9783714fcf8c69f56befb643d.png" alt="ConcurrentHashMap结构图"></p>
+<p>不难看出，concurrentHashMap采用了二次hash的方式，第一次hash将key映射到对应的segment，而第二次hash则是映射到segment的不同桶中。这样就可以使得对于map的修改不会锁住整个容器，提高并发能力。</p>
+</blockquote>
+<h2 id="2-2-ConcurrentHashMap的初始化"><a href="#2-2-ConcurrentHashMap的初始化" class="headerlink" title="2.2 ConcurrentHashMap的初始化"></a>2.2 ConcurrentHashMap的初始化</h2><blockquote>
+<p>如下是ConcurrentHashMap的初始化源码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 初始化方法</div><div class="line"> * initialCapacity：初始化容量，默认16</div><div class="line"> * loadFactor：负载因子，默认0.75</div><div class="line"> * concurrencyLevel：并发量等级，默认16，最高65535。即为锁的数量，segment数组的大小（内部保证是不小于该数的2的幂次）</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">ConcurrentHashMap</span><span class="params">(<span class="keyword">int</span> initialCapacity,</span></span></div><div class="line">                         <span class="keyword">float</span> loadFactor, <span class="keyword">int</span> concurrencyLevel) &#123;</div><div class="line">    <span class="keyword">if</span> (!(loadFactor &gt; <span class="number">0</span>) || initialCapacity &lt; <span class="number">0</span> || concurrencyLevel &lt;= <span class="number">0</span>)</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</div><div class="line">    <span class="keyword">if</span> (concurrencyLevel &gt; MAX_SEGMENTS)</div><div class="line">        concurrencyLevel = MAX_SEGMENTS;</div><div class="line">    <span class="keyword">int</span> sshift = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> ssize = <span class="number">1</span>;</div><div class="line">    <span class="comment">// 保证ssize是2的幂次，为了能通过按位与实现散列算法</span></div><div class="line">    <span class="keyword">while</span> (ssize &lt; concurrencyLevel) &#123;</div><div class="line">        ++sshift;</div><div class="line">        ssize &lt;&lt;= <span class="number">1</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 初始化段偏移量和段掩码，需要在定位segment时的散列算法中使用</span></div><div class="line">    <span class="keyword">this</span>.segmentShift = <span class="number">32</span> - sshift;</div><div class="line">    <span class="keyword">this</span>.segmentMask = ssize - <span class="number">1</span>;</div><div class="line">    <span class="keyword">if</span> (initialCapacity &gt; MAXIMUM_CAPACITY)</div><div class="line">        initialCapacity = MAXIMUM_CAPACITY;</div><div class="line">    <span class="keyword">int</span> c = initialCapacity / ssize;</div><div class="line">    <span class="keyword">if</span> (c * ssize &lt; initialCapacity)</div><div class="line">        ++c;</div><div class="line">    <span class="keyword">int</span> cap = MIN_SEGMENT_TABLE_CAPACITY;</div><div class="line">    <span class="keyword">while</span> (cap &lt; c)</div><div class="line">        cap &lt;&lt;= <span class="number">1</span>;</div><div class="line">    <span class="comment">// 初始化segment</span></div><div class="line">    Segment&lt;K,V&gt; s0 =</div><div class="line">        <span class="keyword">new</span> Segment&lt;K,V&gt;(loadFactor, (<span class="keyword">int</span>)(cap * loadFactor),</div><div class="line">                         (HashEntry&lt;K,V&gt;[])<span class="keyword">new</span> HashEntry[cap]);</div><div class="line">    Segment&lt;K,V&gt;[] ss = (Segment&lt;K,V&gt;[])<span class="keyword">new</span> Segment[ssize];</div><div class="line">    UNSAFE.putOrderedObject(ss, SBASE, s0); <span class="comment">// ordered write of segments[0]</span></div><div class="line">    <span class="keyword">this</span>.segments = ss;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>CurrentHashMap的初始化一共有三个参数，一个initialCapacity，表示初始的容量，一个loadFactor，表示负载参数，最后一个是concurrentLevel，代表ConcurrentHashMap内部的Segment的数量，ConcurrentLevel一经指定，不可改变，后续如果ConcurrentHashMap的元素数量增加导致ConrruentHashMap需要扩容，ConcurrentHashMap不会增加Segment的数量，而只会增加Segment中链表数组的容量大小，这样的好处是扩容过程不需要对整个ConcurrentHashMap做rehash，而只需要对Segment里面的元素做一次rehash就可以了。</p>
+<p>总的来说初始化过程是初始化了两个参数，加一个数组。两个参数分别是segmentShift（段偏移量）、segmentMask（段掩码），数组则是segments（concurrentHashMap的可重入锁）。而这三个都是有ssize变量间接得到的。</p>
+<ol>
+<li>首先通过并发等级，计算出不小于此数的最小2的次幂。这便是ssize。</li>
+<li>segmentShift就是32与ssize幂次的差值。（这里的32是因为hash算法将每个对象的hashcode进行在hash得到的值最大是32二进制）</li>
+<li>segmentMask就是ssize-1。</li>
+<li>segments的大小便是ssize。</li>
+</ol>
+<p>默认情况下segmentShift是28，segmentMask是15，他们均是散列算法定位segment的两个参数。具体代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Hash-based segment and entry accesses</span></div><div class="line"><span class="comment">/**</span></div><div class="line"> * Get the segment for the given hash</div><div class="line"> */</div><div class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</div><div class="line"><span class="function"><span class="keyword">private</span> Segment&lt;K,V&gt; <span class="title">segmentForHash</span><span class="params">(<span class="keyword">int</span> h)</span> </span>&#123;</div><div class="line">    <span class="keyword">long</span> u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;</div><div class="line">    <span class="keyword">return</span> (Segment&lt;K,V&gt;) UNSAFE.getObjectVolatile(segments, u);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>另外，为什么ssize必须是2的次幂呢？因为这里用了一个很巧妙的位运算来定位segment下的hashentry数组的位置。其实两次定位用到的hash算法均是利用了2的幂次数这一个特点。我们可以从get方法看到，如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</div><div class="line">    Segment&lt;K,V&gt; s; <span class="comment">// manually integrate access methods to reduce overhead</span></div><div class="line">    HashEntry&lt;K,V&gt;[] tab;</div><div class="line">    <span class="keyword">int</span> h = hash(key);</div><div class="line">    <span class="keyword">long</span> u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;</div><div class="line">    <span class="comment">// 取segments中的锁</span></div><div class="line">    <span class="keyword">if</span> ((s = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(segments, u)) != <span class="keyword">null</span> &amp;&amp;</div><div class="line">        (tab = s.table) != <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="comment">// 便利segment中的hashEntry</span></div><div class="line">        <span class="keyword">for</span> (HashEntry&lt;K,V&gt; e = (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile</div><div class="line">                 (tab, ((<span class="keyword">long</span>)(((tab.length - <span class="number">1</span>) &amp; h)) &lt;&lt; TSHIFT) + TBASE);</div><div class="line">             e != <span class="keyword">null</span>; e = e.next) &#123;</div><div class="line">            K k;</div><div class="line">            <span class="keyword">if</span> ((k = e.key) == key || (e.hash == h &amp;&amp; key.equals(k)))</div><div class="line">                <span class="keyword">return</span> e.value;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>分析第5行和第11行，这两行分别是定位segment的hash算法和在segment中的hashEntry数组定位entry的hash算法。他们的算法其实都是一样的，都是用再哈希的值和总长度-1的值按位与（segmentMask其实是ssize-1）。其中，只有当tab.length和ssize为2的幂次的时候，这个运算就相当于h%tabn.length（h%ssize）。另外，定位HashEntry和定位Segment的散列算法虽然一样，都是与数组的长度-1再相“&amp;”,但是&amp;的值不一样，定位Segment使用的是元素的hashcode通过再散列后得到的值的高位，而定位HashEntry直接使用的是再散列后的值。其目的是避免两次散列后的值一样，虽然元素在segment里散列开了，但是却没有再HashEntry里散列看。</p>
+</blockquote>
+<h2 id="2-3-ConcurrentHashMap的关键操作"><a href="#2-3-ConcurrentHashMap的关键操作" class="headerlink" title="2.3 ConcurrentHashMap的关键操作"></a>2.3 ConcurrentHashMap的关键操作</h2><h3 id="2-3-1-get操作"><a href="#2-3-1-get操作" class="headerlink" title="2.3.1 get操作"></a>2.3.1 get操作</h3><blockquote>
+<p>Segment的get操作实现非常简单和高效。先经过一次对hashcode的再散列，然后使用这个散列值通过第一次的segmentForHash散列运算定位到Segment，再通过第二次的entryForHash散列算法定位到具体的元素。具体的get操作代码已经在上面列出了。</p>
+<p>get操作的高效之处在于整个get过程不需要加锁，除非读到的值是空才会加锁重读。原因是它的get方法里将要使用的共享变量都定义成了volatile类型，如用于统计当前segement大小的count字段和用于存储值的HashEntry的value。而在get操作里只需要读不需要写共享变量count和value，所以可以不用加锁。像我们之前说的，加了volatile的value也不会读到过期的值了。这便是使用volatile替换锁的经典应用场景。</p>
+</blockquote>
+<h3 id="2-3-2-put操作"><a href="#2-3-2-put操作" class="headerlink" title="2.3.2 put操作"></a>2.3.2 put操作</h3><blockquote>
+<p>put操作涉及到内存的写，为了保证线程安全，则需要加锁。ConcurrentHashMap是分段锁，在运行下面关键代码之前，需要先散列算出segment数组中的位置，然后调用segment的ensureSegment方法。具体方法也很简单循环遍历判断key值，有责改并退出，无责增加，并考虑扩容。相比于hashmap的put方法无非就是在前后增加了lock锁，另外扩容不是整体扩容而是针对segment下的hashEntry扩容。下面便是ensureSegment的源代码：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">final</span> V <span class="title">put</span><span class="params">(K key, <span class="keyword">int</span> hash, V value, <span class="keyword">boolean</span> onlyIfAbsent)</span> </span>&#123;</div><div class="line">    HashEntry&lt;K,V&gt; node = tryLock() ? <span class="keyword">null</span> :</div><div class="line">        scanAndLockForPut(key, hash, value);</div><div class="line">    V oldValue;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        HashEntry&lt;K,V&gt;[] tab = table;</div><div class="line">        <span class="keyword">int</span> index = (tab.length - <span class="number">1</span>) &amp; hash;</div><div class="line">        HashEntry&lt;K,V&gt; first = entryAt(tab, index);</div><div class="line">        <span class="keyword">for</span> (HashEntry&lt;K,V&gt; e = first;;) &#123;</div><div class="line">            <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</div><div class="line">                K k;</div><div class="line">                <span class="keyword">if</span> ((k = e.key) == key ||</div><div class="line">                    (e.hash == hash &amp;&amp; key.equals(k))) &#123;</div><div class="line">                    oldValue = e.value;</div><div class="line">                    <span class="keyword">if</span> (!onlyIfAbsent) &#123;</div><div class="line">                        e.value = value;</div><div class="line">                        ++modCount;</div><div class="line">                    &#125;</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                &#125;</div><div class="line">                e = e.next;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">if</span> (node != <span class="keyword">null</span>)</div><div class="line">                    node.setNext(first);</div><div class="line">                <span class="keyword">else</span></div><div class="line">                    node = <span class="keyword">new</span> HashEntry&lt;K,V&gt;(hash, key, value, first);</div><div class="line">                <span class="keyword">int</span> c = count + <span class="number">1</span>;</div><div class="line">                <span class="comment">// 是否扩容是看tab的大小是否超过了设定的值</span></div><div class="line">                <span class="comment">// 设定的值是通过散列因子和初始化决定的，是在初始化的时候设置的</span></div><div class="line">                <span class="keyword">if</span> (c &gt; threshold &amp;&amp; tab.length &lt; MAXIMUM_CAPACITY)</div><div class="line">                    rehash(node);</div><div class="line">                <span class="keyword">else</span></div><div class="line">                    setEntryAt(tab, index, node);</div><div class="line">                ++modCount;</div><div class="line">                count = c;</div><div class="line">                oldValue = <span class="keyword">null</span>;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        unlock();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> oldValue;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>值得注意的是第17行和第35行的modCount变量，此变量是所有桶公用的变量，是用来统计变化数的，所以put、remove和clean方法里才做元素后都会将变量modeCount进行加1。这是为了统计size的时候用的，具体用法请看下一节。</p>
+<p>另外在扩容的时候，首先会创建一个容量为原来容量两倍的数组，然后将原数组里的元素进行再散列后插入到新的数组里。下面是扩容的源代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">rehash</span><span class="params">(HashEntry&lt;K,V&gt; node)</span> </span>&#123;</div><div class="line">    HashEntry&lt;K,V&gt;[] oldTable = table;</div><div class="line">    <span class="keyword">int</span> oldCapacity = oldTable.length;</div><div class="line">    <span class="keyword">int</span> newCapacity = oldCapacity &lt;&lt; <span class="number">1</span>;</div><div class="line">    threshold = (<span class="keyword">int</span>)(newCapacity * loadFactor);</div><div class="line">    HashEntry&lt;K,V&gt;[] newTable =</div><div class="line">        (HashEntry&lt;K,V&gt;[]) <span class="keyword">new</span> HashEntry[newCapacity];</div><div class="line">    <span class="keyword">int</span> sizeMask = newCapacity - <span class="number">1</span>;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; oldCapacity ; i++) &#123;</div><div class="line">        HashEntry&lt;K,V&gt; e = oldTable[i];</div><div class="line">        <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</div><div class="line">            HashEntry&lt;K,V&gt; next = e.next;</div><div class="line">            <span class="keyword">int</span> idx = e.hash &amp; sizeMask;</div><div class="line">            <span class="keyword">if</span> (next == <span class="keyword">null</span>)   <span class="comment">//  Single node on list</span></div><div class="line">                newTable[idx] = e;</div><div class="line">            <span class="keyword">else</span> &#123; <span class="comment">// Reuse consecutive sequence at same slot</span></div><div class="line">                HashEntry&lt;K,V&gt; lastRun = e;</div><div class="line">                <span class="keyword">int</span> lastIdx = idx;</div><div class="line">                <span class="keyword">for</span> (HashEntry&lt;K,V&gt; last = next;</div><div class="line">                     last != <span class="keyword">null</span>;</div><div class="line">                     last = last.next) &#123;</div><div class="line">                    <span class="keyword">int</span> k = last.hash &amp; sizeMask;</div><div class="line">                    <span class="keyword">if</span> (k != lastIdx) &#123;</div><div class="line">                        lastIdx = k;</div><div class="line">                        lastRun = last;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                newTable[lastIdx] = lastRun;</div><div class="line">                <span class="comment">// Clone remaining nodes</span></div><div class="line">                <span class="keyword">for</span> (HashEntry&lt;K,V&gt; p = e; p != lastRun; p = p.next) &#123;</div><div class="line">                    V v = p.value;</div><div class="line">                    <span class="keyword">int</span> h = p.hash;</div><div class="line">                    <span class="keyword">int</span> k = h &amp; sizeMask;</div><div class="line">                    HashEntry&lt;K,V&gt; n = newTable[k];</div><div class="line">                    newTable[k] = <span class="keyword">new</span> HashEntry&lt;K,V&gt;(h, p.key, v, n);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">int</span> nodeIndex = node.hash &amp; sizeMask; <span class="comment">// add the new node</span></div><div class="line">    node.setNext(newTable[nodeIndex]);</div><div class="line">    newTable[nodeIndex] = node;</div><div class="line">    table = newTable;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="2-3-3-size操作"><a href="#2-3-3-size操作" class="headerlink" title="2.3.3 size操作"></a>2.3.3 size操作</h3><blockquote>
+<p>在前面的操作里，我们设计到的操作都是单个Segment中进行的，但是ConcurrentHashMap有一些操作是在多个Segment中进行，比如size操作，ConcurrentHashMap的size操作也采用了一种比较巧的方式，来尽量避免对所有Segment都加锁。</p>
+<p>前面我们提到了一个modCount变量，代表的是对Segment中元素的数量造成影响的操作的次数，这个值只增不减，size操作就是遍历了两次Segment，每次记录Segment的modCount值，然后将两次的modCount进行比较，如果相同，则表示期间没有发生过写入操作，就将原先遍历的结果返回，如果不相同，则把这个过程在重复做一次，如果再不相同，则就需要将所有的Segment都锁住，然后一个一个遍历了。具体代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// Try a few times to get accurate count. On failure due to</span></div><div class="line">    <span class="comment">// continuous async changes in table, resort to locking.</span></div><div class="line">    <span class="keyword">final</span> Segment&lt;K,V&gt;[] segments = <span class="keyword">this</span>.segments;</div><div class="line">    <span class="keyword">int</span> size;</div><div class="line">    <span class="keyword">boolean</span> overflow; <span class="comment">// true if size overflows 32 bits</span></div><div class="line">    <span class="keyword">long</span> sum;         <span class="comment">// sum of modCounts</span></div><div class="line">    <span class="keyword">long</span> last = <span class="number">0L</span>;   <span class="comment">// previous sum</span></div><div class="line">    <span class="keyword">int</span> retries = -<span class="number">1</span>; <span class="comment">// first iteration isn't retry</span></div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="keyword">for</span> (;;) &#123;</div><div class="line">            <span class="comment">// 计算次数如果大于RETRIES_BEFORE_LOCK，就用锁</span></div><div class="line">            <span class="keyword">if</span> (retries++ == RETRIES_BEFORE_LOCK) &#123;</div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; segments.length; ++j)</div><div class="line">                    ensureSegment(j).lock(); <span class="comment">// force creation</span></div><div class="line">            &#125;</div><div class="line">            sum = <span class="number">0L</span>;</div><div class="line">            size = <span class="number">0</span>;</div><div class="line">            overflow = <span class="keyword">false</span>;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; segments.length; ++j) &#123;</div><div class="line">                Segment&lt;K,V&gt; seg = segmentAt(segments, j);</div><div class="line">                <span class="keyword">if</span> (seg != <span class="keyword">null</span>) &#123;</div><div class="line">                    sum += seg.modCount;</div><div class="line">                    <span class="keyword">int</span> c = seg.count;</div><div class="line">                    <span class="keyword">if</span> (c &lt; <span class="number">0</span> || (size += c) &lt; <span class="number">0</span>)</div><div class="line">                        overflow = <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// 两次计算的相等，说明期间没有变化，直接返回</span></div><div class="line">            <span class="keyword">if</span> (sum == last)</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            last = sum;</div><div class="line">        &#125;</div><div class="line">    &#125; <span class="keyword">finally</span> &#123;</div><div class="line">        <span class="keyword">if</span> (retries &gt; RETRIES_BEFORE_LOCK) &#123;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; segments.length; ++j)</div><div class="line">                segmentAt(segments, j).unlock();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> overflow ? Integer.MAX_VALUE : size;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h1 id="三、无需用锁的情况与单例模式的双重检验"><a href="#三、无需用锁的情况与单例模式的双重检验" class="headerlink" title="三、无需用锁的情况与单例模式的双重检验"></a>三、无需用锁的情况与单例模式的双重检验</h1><blockquote>
+<p>要保证线程安全，并不是一定就要进行同步，两者没有因果关系。同步只是保障共享数据争用时的正确信的手段，如果一个方法本身就不涉及共享数据，那他自然局无须任何同步措施去保证正确性，因此会有一些代码天生就是线程安全的，下面简单的介绍其中的两类。</p>
+</blockquote>
+<h2 id="3-1-可重入代码-Reentrant-Code"><a href="#3-1-可重入代码-Reentrant-Code" class="headerlink" title="3.1 可重入代码(Reentrant Code)"></a>3.1 可重入代码(Reentrant Code)</h2><blockquote>
+<p>这种代码也叫纯代码（Pure Code），可以在代码执行的任何时刻中断它，转而去执行另外一段代码（包括递归调用它本身），而在控制权返回后，原来的程序不会出现任何错误。相对线程安全来说，可重入性是更基本的特性，他可以保证线程安全，即所有的可重入代码都是现成安全的，但是并非所有的线程安全的代码都是可重入的。</p>
+<p>可重入代码有一些共同的特征：例如不依赖存储在堆上的数据和公用的系统资源、用到的状态量都是由参数中传入、不调用非可重入的方法等。我们可以通过一个简单一些的原则来判断代码是否具备可重入性：如果一个方法，它的返回结果是可以预测的，只要输入了相同的数据，就都能返回相同的结果，那它就是满足可重入性的要求，当然也就是线程安全的。</p>
+</blockquote>
+<h2 id="3-2-线程本地存储（Thread-Local-Storage）"><a href="#3-2-线程本地存储（Thread-Local-Storage）" class="headerlink" title="3.2 线程本地存储（Thread Local Storage）"></a>3.2 线程本地存储（Thread Local Storage）</h2><blockquote>
+<p>如果一段代码中所需要的数据必须与其他代码共享，那就看看这些共享数据的代码是否能保证在同一个线程中执行？如果能保证，我们就可以把共享数据的可见范围限制在同一个线程之内，这样，无须同步也能保证线程之间不出现数据争用的问题。</p>
+<p>符合这种特点的应用并不少见，大部分使用消息队列的架构模式（如“生产者-消费者”模式）都会将产品的消费过程尽量在一个线程中消费完，其中最重要的一个应用实例就是经典Web交互模型中的“一个请求对应一个服务器线程”（Thread-per-Request）的处理方式。在Tomcat源码中我们可以发现每一个请求来的时候都会用一个单独的线程进行处理，这种处理方式的广泛引用使得Web服务端的很多应用都可以使用线程本地存储来解决线程的安全问题。如下图：</p>
+</blockquote>
+<p><img src="http://img.blog.csdn.net/20160824205606343" alt="这里写图片描述"></p>
+<blockquote>
+<p>另外，Java语言中，如果一个变量要被多个线程访问，可以使用volatile关键字声明它为“易变的”；如果一个变量被某个线程独享，因为Java中没有类似C++中_declspec(thread)这样的关键字，不过可以通过java.lang.ThreadLocal类来实现线程本地存储的功能。每一个线程的Thread对象中都有一个ThreadLoaclMap对象，这个对象存储了一组以ThreadLocal.threadLocalHashCode为键，以本地线程变量为值的K-V值对，ThreadLocal对象就是当前线程的ThreadLocalMap的访问入口，每一个ThreadLocal对象都包含了一个独一无二的threadLocalHashCode值，使用这个值就可以在县城K-V值对中找回对应的本地线程变量。</p>
+</blockquote>
+<h2 id="3-3-单例模式的双重检验"><a href="#3-3-单例模式的双重检验" class="headerlink" title="3.3 单例模式的双重检验"></a>3.3 单例模式的双重检验</h2><blockquote>
+<p>首先来看一下一个正确的最简单的饿汉式单例模式<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 饿汉式单例模式Demo</div><div class="line"> * com.xiaocao Singleton.java</div><div class="line"> * <span class="doctag">@author</span> muxiaocao &#123;http://www.muxiaocao.me&#125;</div><div class="line"> * <span class="doctag">@github</span> &#123;https://github.com/MuXiaoCao&#125;</div><div class="line"> * <span class="doctag">@time</span> 2016年8月24日</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonDemo</span> </span>&#123;</div><div class="line">	<span class="comment">/**</span></div><div class="line">	 * 必须为volatile</div><div class="line">	 */</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> SingletonDemo instance;</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">SingletonDemo</span><span class="params">()</span> </span>&#123; &#125;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> SingletonDemo <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="comment">/**</span></div><div class="line">		 * 第一重检验：可去掉</div><div class="line">		 */</div><div class="line">		<span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</div><div class="line">			<span class="comment">/**</span></div><div class="line">			 * 必须上锁</div><div class="line">			 */</div><div class="line">			<span class="keyword">synchronized</span> (instance) &#123;</div><div class="line">				<span class="comment">/**</span></div><div class="line">				 * 第二重检验：必须加</div><div class="line">				 */</div><div class="line">				<span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</div><div class="line">					instance = <span class="keyword">new</span> SingletonDemo();</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> instance;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>需要注意的地方有三个：</p>
+<ol>
+<li>双重检验的第二重必须有。<br>假设有两个并发线程A和B执行getInstance（），最开始的时候instance为null，最在一个线程初始化之前AB线程均可以通过第一重检验进入if语句，等待instance锁。那么当A现成初始化完，B继续执行还会进行一遍初始化，这就违反了单例模式。</li>
+<li>instance的volatile关键字必须有。<br>因为SingletonDemo的初始化动作并非是一个原子性的，至少需要开辟内存、执行初始化方法、引用指向三步操作。假设AB两个线程并发执行，当A执行初始化的时候，由于处理器重排，先执行了引用指向，还没来得及执行初始化方法的时候，执行B。这时候对于B来说instance不为null，所以直接返回。那么当B再调用方法的时候，就会出现错误了，因为这时候还没有初始化完成。而当加了volatile，就会使用内存屏障机-StoreLoad，禁止了这种处理器重排，那就不会出现上述情况了。</li>
+<li>第一重检验理论上是可以去掉的，但是处于性能的考虑最好加上。</li>
+</ol>
+</blockquote>
+<h1 id="四、一个有趣的Java多线程题目"><a href="#四、一个有趣的Java多线程题目" class="headerlink" title="四、一个有趣的Java多线程题目"></a>四、一个有趣的Java多线程题目</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">	public class ThreadTest &#123;</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		MyThread thread = new MyThread();</div><div class="line">		thread.start();</div><div class="line">		try &#123;</div><div class="line">			Thread.sleep(2000);</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">		thread.stopThread();</div><div class="line">	&#125;</div><div class="line">	public static class MyThread extends Thread&#123;</div><div class="line">		private boolean isStop = false;</div><div class="line">		@Override</div><div class="line">		public void run() &#123;</div><div class="line">			int i = 0;</div><div class="line">			for(;;) &#123;</div><div class="line">				i++;</div><div class="line">				if (isStop) &#123;</div><div class="line">					break;</div><div class="line">				&#125;</div><div class="line">			&#125;</div><div class="line">			System.out.println(&quot;stop thread&quot;);</div><div class="line">		&#125;</div><div class="line">		public void stopThread() &#123;</div><div class="line">			isStop = true;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ol>
+<li>此程序会正常终止吗？</li>
+<li>在for循环里增加一个System.out.println()就会停止，为什么呢？</li>
+<li>将isStop改为volatile变量，程序也会正常终止，为什么呢？</li>
+</ol>
+<hr>
+<blockquote>
+<p><strong>注意</strong>：转载请标明，转自<a href="http://blog.csdn.net/qq_25689397/article/details/52304051" target="_blank" rel="external">itboy-木小草</a>。<br><strong>尊重原创，尊重技术。</strong></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/25/hello-world/" rel="prev" title="Hello World">
+                Hello World <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="木小草" />
+          <p class="site-author-name" itemprop="name">木小草</p>
+          <p class="site-description motion-element" itemprop="description">Java Linux 算法 架构</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">2</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、从sychronized到ReentrantLock"><span class="nav-number">1.</span> <span class="nav-text">一、从sychronized到ReentrantLock</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-重量级，阻塞同步：sychronized"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 重量级，阻塞同步：sychronized</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-原子操作：CAS"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 原子操作：CAS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-Java提供原子操作的Unsafe类"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 Java提供原子操作的Unsafe类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-Unsafe之上的非阻塞同步实现"><span class="nav-number">1.4.</span> <span class="nav-text">1.3 Unsafe之上的非阻塞同步实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-volatile的定义与实现"><span class="nav-number">1.5.</span> <span class="nav-text">1.4 volatile的定义与实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-ReentrantLock锁的实现"><span class="nav-number">1.6.</span> <span class="nav-text">1.5 ReentrantLock锁的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-1-ReentrantLock的结构"><span class="nav-number">1.6.1.</span> <span class="nav-text">1.5.1 ReentrantLock的结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-2-公平锁-FairSync"><span class="nav-number">1.6.2.</span> <span class="nav-text">1.5.2 公平锁-FairSync</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-3-同步器AbstractQueuedSynchronizer"><span class="nav-number">1.6.3.</span> <span class="nav-text">1.5.3 同步器AbstractQueuedSynchronizer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-4-总结"><span class="nav-number">1.6.4.</span> <span class="nav-text">1.5.4 总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、从ReentrantLock到ConcurrentHashMap"><span class="nav-number">2.</span> <span class="nav-text">二、从ReentrantLock到ConcurrentHashMap</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-ConcurrentHashMap的结构"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 ConcurrentHashMap的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-ConcurrentHashMap的初始化"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 ConcurrentHashMap的初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-ConcurrentHashMap的关键操作"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 ConcurrentHashMap的关键操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-get操作"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1 get操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2-put操作"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2 put操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-3-size操作"><span class="nav-number">2.3.3.</span> <span class="nav-text">2.3.3 size操作</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、无需用锁的情况与单例模式的双重检验"><span class="nav-number">3.</span> <span class="nav-text">三、无需用锁的情况与单例模式的双重检验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-可重入代码-Reentrant-Code"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 可重入代码(Reentrant Code)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-线程本地存储（Thread-Local-Storage）"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 线程本地存储（Thread Local Storage）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-单例模式的双重检验"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 单例模式的双重检验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、一个有趣的Java多线程题目"><span class="nav-number">4.</span> <span class="nav-text">四、一个有趣的Java多线程题目</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">木小草</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
