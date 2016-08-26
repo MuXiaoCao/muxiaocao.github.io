@@ -258,8 +258,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/08/25/hello-world/" itemprop="url">
-                  Hello World
+                <a class="post-title-link" href="/2016/08/26/hexo博客搭建/" itemprop="url">
+                  Hello Hexo
                 </a>
               
             
@@ -272,11 +272,30 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-25T14:01:43+08:00" content="2016-08-25">
-              2016-08-25
+            <time itemprop="dateCreated" datetime="2016-08-26T00:00:00+08:00" content="2016-08-26">
+              2016-08-26
             </time>
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index">
+                    <span itemprop="name">Git</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -284,8 +303,17 @@
           
 
           
-
+	
           
+          
+             <span id="/2016/08/26/hexo博客搭建/" class="leancloud_visitors" data-flag-title="Hello Hexo">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
           
 
           
@@ -302,15 +330,83 @@
       
         
           
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+            <blockquote>
+<p>准备阶段：</p>
+</blockquote>
+<pre><code>1. 安装git客户端
+2. 安装node
+3. 准备好属于自己的域名，最好有自己的服务器
+4. 申请github账号
+</code></pre><h1 id="安装和配置Hexo"><a href="#安装和配置Hexo" class="headerlink" title="安装和配置Hexo"></a>安装和配置Hexo</h1><ol>
+<li><p>打开Git-bash或者cmd，输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install -g hexo-cli</div></pre></td></tr></table></figure>
+</li>
+<li><p>本地建站</p>
+<p> 选择一个文件夹下，使用如下命令：<br> <code>hexo init</code><br> <code>npm install</code><br> 如果hexo安装成功，则会在该目录下生成如下的目录结构<br> <img src="http://i.imgur.com/YxvWsWf.png" alt=""></p>
+</li>
+<li><p>本地测试</p>
+<p> <code>hexo s</code><br> 提示：<br> <img src="http://i.imgur.com/7qp42fz.png" alt=""><br> 接下来就可以使用浏览器访问啦！不过现在是本地的，如果想放到万维网并使用自己的域名就需要配合github了。</p>
+<h1 id="主题更换"><a href="#主题更换" class="headerlink" title="主题更换"></a>主题更换</h1><blockquote>
+<p>clone主题代码到git上</p>
+</blockquote>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://..</div></pre></td></tr></table></figure>
+<blockquote>
+<p>修改config.yml配置文件</p>
+</blockquote>
+<pre><code>将里面的theme: 的值改为对应的主题
+</code></pre><blockquote>
+<p>提交代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git add .</div><div class="line">commit -m &quot;备注&quot;</div><div class="line">git push origin master</div></pre></td></tr></table></figure>
+<blockquote>
+<p>发布和测试</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo d -g //会出现很多文件</div><div class="line">hexo s</div></pre></td></tr></table></figure>
+<h1 id="使用Github-Pages"><a href="#使用Github-Pages" class="headerlink" title="使用Github Pages"></a>使用Github Pages</h1><ol>
+<li>在自己的github上创建名为xxx.github.io的repository</li>
+<li>设置repository的pages，具体操作去github官网查看（可以设置上自己的域名）</li>
+<li>创建CNMAE文件，写入自己的域名</li>
+<li><p>将本地hexo根目录下的<code>_config.yml</code>中的如下位置，填写自己的信息</p>
+<p> <img src="http://i.imgur.com/kDYceNd.png" alt=""> </p>
+</li>
+<li><p>将上一步的hexo代码上传到repository</p>
+<p> <code>git status</code> 查看状态</p>
+<p> <code>git add .</code></p>
+<p> <code>git commit -m &quot;备注&quot;</code></p>
+<p> <code>git pull origin master</code></p>
+<p> <code>git push origin master</code></p>
+</li>
+<li><p>发布</p>
+<p> <code>hexo d -g</code></p>
+<blockquote>
+<p>这时候，就可以用repository名，也就是xxx.github.io进行访问了。</p>
+</blockquote>
+</li>
+</ol>
+<h1 id="域名解析设置"><a href="#域名解析设置" class="headerlink" title="域名解析设置"></a>域名解析设置</h1><p>如下图：<br><img src="http://i.imgur.com/tuiyoWD.png" alt=""></p>
+<p>设置好后，大约十分钟，便可用域名访问啦！</p>
+<h1 id="发表文章"><a href="#发表文章" class="headerlink" title="发表文章"></a>发表文章</h1><blockquote>
+<p>发表文章操作非常简单，在网站存放的根目录打开git bash，输入</p>
+</blockquote>
+<pre><code>hexo n &quot;name of the new post&quot;
+</code></pre><blockquote>
+<p>回车后，在source文件夹下的_post文件夹下，可以看到新建了一个name of the new post.md的文件，打开填写文件头信息<br><img src="http://i.imgur.com/5jtBn7m.png" alt=""></p>
+<p>可以给文章贴上相应的tags，如有多个则按照如下格式</p>
+</blockquote>
+<p><code>[tag1, tag2, tag3, ...]</code></p>
+<blockquote>
+<p>　在- - -下方添加正文内容即可，注意需要使用markdown语法进行书写。在这里有关于Markdown语法的简单说明。推荐使用CMDmarkdown进行md文件的编辑工作。<br>文章撰写完成后保存，输入</p>
+</blockquote>
+<pre><code>hexo g -d
+</code></pre><blockquote>
+<p>即可生成新网站，并且同步Github上的网站内容。</p>
+</blockquote>
+<hr>
+<blockquote>
+<p><strong>注意</strong>：转载请标明，转自<a href="http://muxiaocao.cn" target="_blank" rel="external">itboy-木小草</a>。<br><strong>尊重原创，尊重技术。</strong></p>
+</blockquote>
 
           
         
@@ -405,8 +501,17 @@
           
 
           
-
+	
           
+          
+             <span id="/2016/08/20/同步互斥/" class="leancloud_visitors" data-flag-title="漫谈Java中的互斥同步">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
           
 
           
@@ -690,7 +795,7 @@
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
+               src="/images/avatar.png"
                alt="木小草" />
           <p class="site-author-name" itemprop="name">木小草</p>
           <p class="site-description motion-element" itemprop="description">Java Linux 算法 架构</p>
@@ -706,7 +811,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -849,6 +954,113 @@
   
 
   
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("n0ekDjstRAfmvxAbvhQfQGCv-gzGzoHsz", "qg1MGh57NY3eWBJfnAdltsRm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
 
   
 
