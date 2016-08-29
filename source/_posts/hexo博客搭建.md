@@ -3,6 +3,10 @@ title: Hello Hexo
 date:  2016-08-26
 categories:  Git
 keywords:  [博客搭建, Git使用, Hexo]
+tags: 
+	- 博客搭建
+	- Git使用
+	- Hexo
 ---
 
 > 准备阶段：
