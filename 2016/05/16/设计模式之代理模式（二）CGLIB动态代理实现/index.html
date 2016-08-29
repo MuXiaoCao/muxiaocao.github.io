@@ -1,0 +1,919 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="设计模式， 动态代理，cglib" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/blogICO.png?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="像上一篇所说的代理模式其实是静态代理，在实际开发中其实应用不大，因为他需要事先知道被代理对象是谁，而且被代理对象和代理对象实现了公共的接口。实际情况往往并不能满足这些条件，我们往往在写代理模式的时候并不知道到时候被代理的对象是谁。解决办法就是——动态代理。以下我们将使用CGLIB实现动态代理。
+一、动态代理概述程序在运行期而不是编译器，生成被代理对象的代理对象，并且被代理对象并不需要和代理对象实">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式之代理模式（二）CGLIB动态代理实现">
+<meta property="og:url" content="http://yoursite.com/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/index.html">
+<meta property="og:site_name" content="ITBoy | 木小草">
+<meta property="og:description" content="像上一篇所说的代理模式其实是静态代理，在实际开发中其实应用不大，因为他需要事先知道被代理对象是谁，而且被代理对象和代理对象实现了公共的接口。实际情况往往并不能满足这些条件，我们往往在写代理模式的时候并不知道到时候被代理的对象是谁。解决办法就是——动态代理。以下我们将使用CGLIB实现动态代理。
+一、动态代理概述程序在运行期而不是编译器，生成被代理对象的代理对象，并且被代理对象并不需要和代理对象实">
+<meta property="og:image" content="http://hi.csdn.net/attachment/201109/29/0_1317264486lqGr.gif">
+<meta property="og:image" content="http://img.blog.csdn.net/20160516164615927">
+<meta property="og:image" content="http://img.blog.csdn.net/20160516171648890">
+<meta property="og:image" content="http://img.blog.csdn.net/20160516173324053">
+<meta property="og:image" content="http://img.blog.csdn.net/20160516182207600">
+<meta property="og:updated_time" content="2016-08-29T02:09:43.669Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="设计模式之代理模式（二）CGLIB动态代理实现">
+<meta name="twitter:description" content="像上一篇所说的代理模式其实是静态代理，在实际开发中其实应用不大，因为他需要事先知道被代理对象是谁，而且被代理对象和代理对象实现了公共的接口。实际情况往往并不能满足这些条件，我们往往在写代理模式的时候并不知道到时候被代理的对象是谁。解决办法就是——动态代理。以下我们将使用CGLIB实现动态代理。
+一、动态代理概述程序在运行期而不是编译器，生成被代理对象的代理对象，并且被代理对象并不需要和代理对象实">
+<meta name="twitter:image" content="http://hi.csdn.net/attachment/201109/29/0_1317264486lqGr.gif">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/"/>
+
+  <title> 设计模式之代理模式（二）CGLIB动态代理实现 | ITBoy | 木小草 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5fdf6a8183b8779743368e6228b4ceec";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=58122117";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+    <div class="site-meta-headline">
+      <a>
+        <img class="custom-logo-image" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/avatar1.png"
+             alt="ITBoy | 木小草"/>
+      </a>
+    </div>
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ITBoy | 木小草</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">求知若饥，虚心若愚。（Stay hungry. Stay foolish.）</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                设计模式之代理模式（二）CGLIB动态代理实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-16T00:00:00+08:00" content="2016-05-16">
+              2016-05-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/系统架构设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统架构设计</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+	
+          
+          
+             <span id="/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/" class="leancloud_visitors" data-flag-title="设计模式之代理模式（二）CGLIB动态代理实现">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>像上一篇所说的代理模式其实是<strong>静态代理</strong>，在实际开发中其实应用不大，因为他<strong>需要事先知道被代理对象是谁</strong>，而且<strong>被代理对象和代理对象实现了公共的接口</strong>。实际情况往往并不能满足这些条件，我们往往在写代理模式的时候并不知道到时候被代理的对象是谁。解决办法就是——<strong>动态代理</strong>。以下我们将使用<strong>CGLIB实现动态代理</strong>。</p>
+<h2 id="一、动态代理概述"><a href="#一、动态代理概述" class="headerlink" title="一、动态代理概述"></a>一、动态代理概述</h2><p><strong>程序在运行期而不是编译器，生成被代理对象的代理对象，并且被代理对象并不需要和代理对象实现共同的接口</strong>。基于此，我们可以利用代理对象，<strong>提供一种以控制对被代理对象的访问</strong>。</p>
+<h3 id="1-1-动态代理的原理"><a href="#1-1-动态代理的原理" class="headerlink" title="1.1 动态代理的原理"></a>1.1 动态代理的原理</h3><p>基于CGLIB的动态代理，<strong>其实就是利用了CGLIB，在运行时期生成被代理对象的子类，来作为代理对象</strong>。同时重写了被代理对象的所有方法。当我们用代理对象调用方法的时候，其实是调用的重写后的方法。该方法实际调用的是callback中的用户自定义的代码逻辑，例如权限验证。<strong>当验证通过了，则通过反射，反射出父类（被代理对象）的方法并调用（invoke）</strong>。<br>那么问题来了，<strong>如何生成被代理对象的子类</strong>呢？我们事先并不知道谁是代理对象啊？而且我们在重写调用自定义逻辑呢？</p>
+<h3 id="1-2-CGLIB动态代理的底层实现"><a href="#1-2-CGLIB动态代理的底层实现" class="headerlink" title="1.2 CGLIB动态代理的底层实现"></a>1.2 CGLIB动态代理的底层实现</h3><p>CGLIB是一个强大的高性能的代码生成包。</p>
+<pre><code> 1. 它广泛的被许多AOP的框架使用，例如：Spring AOP和dynaop，为他们提供方法的interception（拦截）；
+  2. hibernate使用CGLIB来代理单端single-ended(多对一和一对一)关联（对集合的延迟抓取，是采用其他机制实现的）；
+  3. EasyMock和jMock是通过使用模仿（moke）对象来测试Java代码的包。
+它们都通过使用CGLIB来为那些没有接口的类创建模仿（moke）对象。
+</code></pre><p>CGLIB包的底层是通过使用一个小而快的<strong>字节码处理框架ASM(Java字节码操控框架)</strong>，来转换字节码并生成新的类。他其实就像JVM一样，可以加载一个指定的类。这样我们就可以实现在运行时期生成我们自定义的class了。下图为<strong>cglib与一些框架和语言的关系（CGLIB Library and ASM Bytecode Framework）</strong><br><img src="http://hi.csdn.net/attachment/201109/29/0_1317264486lqGr.gif" alt="CGLIB结构"></p>
+<h2 id="二、应用场景"><a href="#二、应用场景" class="headerlink" title="二、应用场景"></a>二、应用场景</h2><ol>
+<li>远程代理：也就是为一个对象在不同的地址空间提供局部代表。这样可以隐藏一个对象存在不同地址空间的事实。例如：WebService、RPC、RMI(Remote Method Invocation)等。</li>
+<li>虚拟代理：是根据需要创建开销很大的对象。通过它来存放实例化需要很长时间的真实对象。例如：利用虚拟代理来优化页面的打开速度。</li>
+<li>安全代理：用来控制真实对象访问时的权限。一般用户对象应该在不同访问权限的时候。</li>
+<li>智能指引：是指当调用真实的对象时，代理处理另外一些事情。例如：Spring AOP、Hibernate等。<h2 id="三、结构图"><a href="#三、结构图" class="headerlink" title="三、结构图"></a>三、结构图</h2><img src="http://img.blog.csdn.net/20160516164615927" alt="这里写图片描述"><h2 id="四、实际例子"><a href="#四、实际例子" class="headerlink" title="四、实际例子"></a>四、实际例子</h2><h3 id="4-1-需求：为自定义的BookServiceBean动态生成代理对象，实现权限管理，只允许姓名为张三的对象可以操作。"><a href="#4-1-需求：为自定义的BookServiceBean动态生成代理对象，实现权限管理，只允许姓名为张三的对象可以操作。" class="headerlink" title="4.1 需求：为自定义的BookServiceBean动态生成代理对象，实现权限管理，只允许姓名为张三的对象可以操作。"></a>4.1 需求：为自定义的BookServiceBean动态生成代理对象，实现权限管理，只允许姓名为张三的对象可以操作。</h3><h3 id="4-2-代码示例"><a href="#4-2-代码示例" class="headerlink" title="4.2 代码示例"></a>4.2 代码示例</h3><strong>被代理对象</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">package com.xiaocao.proxy.cglib;</div><div class="line"></div><div class="line">import org.apache.logging.log4j.LogManager;</div><div class="line">import org.apache.logging.log4j.Logger;</div><div class="line"></div><div class="line">public class BookServiceBean &#123;</div><div class="line">	</div><div class="line">	private Logger log = LogManager.getLogger();</div><div class="line">	public BookServiceBean() &#123;</div><div class="line">		log.info(&quot;this is bookservicebean 的构造方法&quot;);</div><div class="line">	&#125;</div><div class="line">	public void create() &#123;</div><div class="line">		System.out.println(&quot;create() is running!&quot;);</div><div class="line">	&#125;</div><div class="line">	public void query() &#123;</div><div class="line">		System.out.println(&quot;query() is running!&quot;);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<p><strong>代理类</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">package com.xiaocao.proxy.cglib;</div><div class="line"></div><div class="line">import java.lang.reflect.Method;</div><div class="line"></div><div class="line">import org.apache.logging.log4j.LogManager;</div><div class="line">import org.apache.logging.log4j.Logger;</div><div class="line"></div><div class="line">import net.sf.cglib.proxy.MethodInterceptor;</div><div class="line">import net.sf.cglib.proxy.MethodProxy;</div><div class="line"></div><div class="line">public class MyCglibProxy implements MethodInterceptor&#123;</div><div class="line"></div><div class="line">	private Logger log = LogManager.getLogger(MyCglibProxy.class);</div><div class="line">	</div><div class="line">	private String name;</div><div class="line">	</div><div class="line">	public MyCglibProxy(String name) &#123;</div><div class="line">		this.name = name;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	public Object intercept(Object object, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable &#123;</div><div class="line"></div><div class="line">		log.info(&quot;调用的方法是：&quot; + method.getName());</div><div class="line">		log.info(&quot;实际调用者是： &quot; + object.getClass());</div><div class="line">		for (Object obj : objects) &#123;</div><div class="line">			log.info(&quot;方法参数类型为：&quot; + obj.getClass());</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		if (!name.equals(&quot;张三&quot;)) &#123;</div><div class="line">			System.out.println(&quot;权限不够&quot;);</div><div class="line">			return null;</div><div class="line">		&#125;</div><div class="line">		Object result = methodProxy.invokeSuper(object, objects);</div><div class="line">		System.out.println(&quot;这是方法后&quot;);</div><div class="line">		return result;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>代理对象工厂</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">package com.xiaocao.proxy.cglib;</div><div class="line"></div><div class="line">import net.sf.cglib.proxy.Enhancer;</div><div class="line"></div><div class="line">public class BookServiceFactory &#123;</div><div class="line">	</div><div class="line">	private BookServiceFactory() &#123;</div><div class="line">		</div><div class="line">	&#125;</div><div class="line">	public static BookServiceBean getProxyInstance(MyCglibProxy myProxy) &#123;</div><div class="line">		Enhancer enhancer = new Enhancer();</div><div class="line">		// 将Enhancer中的superclass属性赋值成BookServiceBean</div><div class="line">		enhancer.setSuperclass(BookServiceBean.class);</div><div class="line">		// 将Enhancer中的callbacks属性赋值成myProxy</div><div class="line">		enhancer.setCallback(myProxy);</div><div class="line">		return (BookServiceBean) enhancer.create();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>测试类</strong></p>
+<blockquote>
+<p>测试类的主题部分很简单，只是通过工厂方法得到代理对象，然后调用，即可通过姓名判断是否有权限执行目标方法。<br>之后我用了许多反射机制来验证我之前想法，包括</p>
+<ol>
+<li>得到的代理对象其实是被代理对象的子类</li>
+<li>代理对象重写了被代理对象的所有方法，我们调用的时候其实是调用的被代理对象的重写方法</li>
+</ol>
+</blockquote>
+<p><strong>具体代码如下：</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div></pre></td><td class="code"><pre><div class="line">package com.xiaocao.proxy.cglib;</div><div class="line"></div><div class="line">import java.io.File;</div><div class="line">import java.io.FileOutputStream;</div><div class="line">import java.lang.reflect.Field;</div><div class="line">import java.lang.reflect.Method;</div><div class="line"></div><div class="line">import org.apache.logging.log4j.LogManager;</div><div class="line">import org.apache.logging.log4j.Logger;</div><div class="line"></div><div class="line">public class Test &#123;</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		Logger log = LogManager.getLogger();</div><div class="line">		BookServiceBean service = BookServiceFactory.getProxyInstance(new MyCglibProxy(&quot;张三&quot;));  </div><div class="line">		service.create(); </div><div class="line"></div><div class="line">		log.info(&quot;我们得到的bean是：&quot; + service.getClass());</div><div class="line">		System.out.println(&quot;实际调用者的父类：&quot; + service.getClass().getSuperclass());</div><div class="line">		try &#123;</div><div class="line">			Class&lt;?&gt; c = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;);</div><div class="line">			Class&lt;?&gt; beanc = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean&quot;);</div><div class="line">			</div><div class="line">			Method[] beanc_method = beanc.getMethods();</div><div class="line">			int i = 1;</div><div class="line">			System.out.println(&quot;原始的bean的方法总共&quot; + beanc_method.length + &quot;个&quot;);</div><div class="line">			for (Method method : beanc_method) &#123;</div><div class="line">		</div><div class="line">				System.out.println(&quot;原始的bean方法&quot; + i++ + method.getName());</div><div class="line">	</div><div class="line">			&#125;</div><div class="line">			i = 1;</div><div class="line">			Method[] methods = c.getMethods();</div><div class="line">			System.out.println(&quot;我们得到的bean的方法总共&quot; + methods.length + &quot;个&quot;);</div><div class="line">			for (Method method : methods) &#123;</div><div class="line">				System.out.println(&quot;我们得到的bean的方法&quot; + i++ + method.getName());</div><div class="line">			&#125;</div><div class="line">			System.out.println(&quot;原始的bean的父类：&quot; + beanc.getSuperclass());</div><div class="line">			System.out.println(&quot;我们得到的bean的父类：&quot; + c.getSuperclass());</div><div class="line"></div><div class="line">			Field[] bean_fields = beanc.getDeclaredFields();</div><div class="line">			i = 1;</div><div class="line">			for (Field field : bean_fields) &#123;</div><div class="line">				System.out.println(&quot;原始bean的属性 &quot; + i++ + field);</div><div class="line">			&#125;</div><div class="line">		</div><div class="line">			Field[] fields = c.getDeclaredFields();</div><div class="line">			i=1;</div><div class="line">			for (Field field : fields) &#123;</div><div class="line">				System.out.println(&quot;我们得到的bean的属性 &quot; + i++ + field);</div><div class="line">			&#125;</div><div class="line">			Class proxyGenerator = Class.forName(&quot;sun.misc.ProxyGenerator&quot;);</div><div class="line">			Method[] methods2 = proxyGenerator.getMethods();</div><div class="line">			for (Method method : methods2) &#123;</div><div class="line">				System.out.println(method);</div><div class="line">				byte[] TempProxySuper = (byte[]) method.invoke(proxyGenerator,&quot;TempProxySuper&quot;, new Class[]&#123;c.getSuperclass()&#125;);</div><div class="line">				byte[] TempProxy = (byte[]) method.invoke(proxyGenerator,&quot;TempProxy&quot;, new Class[]&#123;c&#125;);</div><div class="line">				byte[] TempBean = (byte[]) method.invoke(proxyGenerator,&quot;TempBean&quot;, new Class[]&#123;beanc&#125;);</div><div class="line">				createClassFile(&quot;TempProxy&quot;,TempProxy);</div><div class="line">				createClassFile(&quot;TempProxySuper&quot;,TempProxySuper);</div><div class="line">				createClassFile(&quot;TempBean&quot;, TempBean);</div><div class="line">				break;</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">		&#125; catch (ClassNotFoundException e) &#123;</div><div class="line">			// TODO Auto-generated catch block</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125; catch (Exception e) &#123;</div><div class="line">			// TODO Auto-generated catch block</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125; </div><div class="line">	&#125;</div><div class="line">	/**</div><div class="line">	 * 生成class文件</div><div class="line">	 * @param fileName</div><div class="line">	 * @param classFile</div><div class="line">	 */</div><div class="line">	public static void createClassFile(String fileName,byte[] classFile) &#123;</div><div class="line">		try &#123;</div><div class="line">			File file;</div><div class="line">			FileOutputStream fos = new FileOutputStream(file = new File(fileName+&quot;.class&quot;));</div><div class="line">		fos.write(classFile);</div><div class="line">			fos.flush();</div><div class="line">			fos.close();</div><div class="line">	System.out.println(file.getAbsolutePath());</div><div class="line">		&#125; catch (Exception e) &#123;</div><div class="line">			// TODO Auto-generated catch block</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>注意</strong>：代码中的<code>com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6</code>，是我之前测试得到代理类名称。</p>
+<h3 id="4-3-测试结果"><a href="#4-3-测试结果" class="headerlink" title="4.3 测试结果"></a>4.3 测试结果</h3><p><img src="http://img.blog.csdn.net/20160516171648890" alt="这里写图片描述"><br><img src="http://img.blog.csdn.net/20160516173324053" alt="这里写图片描述"></p>
+<blockquote>
+<p>测试代码的剩下部分是用来生成被代理类、代理类和代理类父类的class，其中用到了<code>sun.misc.ProxyGenerator</code>类的静态方法<code>proxyGenerator</code>,他需要的参数有</p>
+<ol>
+<li>生成的类名</li>
+<li>需要生成的class对象<br>返回值则是<code>byte[]</code>是java的bytecode，可以用来生成class文件。之后就是调用<code>createClassFile</code>生成class了。最后再<strong>反编译（jd-gui反编译软件）</strong>calss文件即可看到具体的类结构了。如下如（有删减）：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div></pre></td><td class="code"><pre><div class="line">import com.xiaocao.proxy.cglib.BookServiceBean..EnhancerByCGLIB..f2cd59c6;</div><div class="line">import java.lang.reflect.InvocationHandler;</div><div class="line">import java.lang.reflect.Method;</div><div class="line">import java.lang.reflect.Proxy;</div><div class="line">import java.lang.reflect.UndeclaredThrowableException;</div><div class="line">import net.sf.cglib.core.Signature;</div><div class="line">import net.sf.cglib.proxy.Callback;</div><div class="line">import net.sf.cglib.proxy.MethodProxy;</div><div class="line"></div><div class="line">public final class TempProxy extends Proxy</div><div class="line">  implements BookServiceBean..EnhancerByCGLIB..f2cd59c6</div><div class="line">&#123;</div><div class="line">  private static Method m1;</div><div class="line">  private static Method m3;</div><div class="line">  private static Method m7;</div><div class="line">  private static Method m2;</div><div class="line">  private static Method m9;</div><div class="line">  private static Method m18;</div><div class="line">  private static Method m20;</div><div class="line">  private static Method m0;</div><div class="line">  private static Method m15;</div><div class="line">  private static Method m11;</div><div class="line">  private static Method m14;</div><div class="line">  private static Method m13;</div><div class="line">  private static Method m19;</div><div class="line">  private static Method m12;</div><div class="line">  private static Method m4;</div><div class="line">  private static Method m17;</div><div class="line">  private static Method m6;</div><div class="line">  private static Method m16;</div><div class="line">  private static Method m8;</div><div class="line">  private static Method m10;</div><div class="line">  private static Method m5;</div><div class="line"></div><div class="line">  public TempProxy(InvocationHandler paramInvocationHandler)</div><div class="line">    throws </div><div class="line">  &#123;</div><div class="line">    super(paramInvocationHandler);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  public final boolean equals(Object paramObject)</div><div class="line">    throws </div><div class="line">  &#123;</div><div class="line">    try</div><div class="line">    &#123;</div><div class="line">      return ((Boolean)this.h.invoke(this, m1, new Object[] &#123; paramObject &#125;)).booleanValue();</div><div class="line">    &#125;</div><div class="line">    catch (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      throw localError;</div><div class="line">    &#125;</div><div class="line">    catch (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      throw new UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  public final Object newInstance(Callback[] paramArrayOfCallback)</div><div class="line">    throws </div><div class="line">  &#123;</div><div class="line">    try</div><div class="line">    &#123;</div><div class="line">      return (Object)this.h.invoke(this, m3, new Object[] &#123; paramArrayOfCallback &#125;);</div><div class="line">    &#125;</div><div class="line">    catch (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      throw localError;</div><div class="line">    &#125;</div><div class="line">    catch (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      throw new UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  public final void query()</div><div class="line">    throws </div><div class="line">  &#123;</div><div class="line">    try</div><div class="line">    &#123;</div><div class="line">      this.h.invoke(this, m7, null);</div><div class="line">      return;</div><div class="line">    &#125;</div><div class="line">    catch (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      throw localError;</div><div class="line">    &#125;</div><div class="line">    catch (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      throw new UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  public final void create()</div><div class="line">    throws </div><div class="line">  &#123;</div><div class="line">    try</div><div class="line">    &#123;</div><div class="line">      this.h.invoke(this, m6, null);</div><div class="line">      return;</div><div class="line">    &#125;</div><div class="line">    catch (Error|RuntimeException localError)</div><div class="line">    &#123;</div><div class="line">      throw localError;</div><div class="line">    &#125;</div><div class="line">    catch (Throwable localThrowable)</div><div class="line">    &#123;</div><div class="line">      throw new UndeclaredThrowableException(localThrowable);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">	......</div><div class="line"></div><div class="line">  static</div><div class="line">  &#123;</div><div class="line">    try</div><div class="line">    &#123;</div><div class="line">      m1 = Class.forName(&quot;java.lang.Object&quot;).getMethod(&quot;equals&quot;, new Class[] &#123; Class.forName(&quot;java.lang.Object&quot;) &#125;);</div><div class="line">      m3 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;newInstance&quot;, new Class[] &#123; Class.forName(&quot;[Lnet.sf.cglib.proxy.Callback;&quot;) &#125;);</div><div class="line">      m7 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;query&quot;, new Class[0]);</div><div class="line">      m2 = Class.forName(&quot;java.lang.Object&quot;).getMethod(&quot;toString&quot;, new Class[0]);</div><div class="line">      m9 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;getCallback&quot;, new Class[] &#123; Integer.TYPE &#125;);</div><div class="line">      m18 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;getClass&quot;, new Class[0]);</div><div class="line">      m20 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;notifyAll&quot;, new Class[0]);</div><div class="line">      m0 = Class.forName(&quot;java.lang.Object&quot;).getMethod(&quot;hashCode&quot;, new Class[0]);</div><div class="line">      m15 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;wait&quot;, new Class[0]);</div><div class="line">      m11 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;CGLIB$SET_STATIC_CALLBACKS&quot;, new Class[] &#123; Class.forName(&quot;[Lnet.sf.cglib.proxy.Callback;&quot;) &#125;);</div><div class="line">      m14 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;setCallbacks&quot;, new Class[] &#123; Class.forName(&quot;[Lnet.sf.cglib.proxy.Callback;&quot;) &#125;);</div><div class="line">      m13 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;setCallback&quot;, new Class[] &#123; Integer.TYPE, Class.forName(&quot;net.sf.cglib.proxy.Callback&quot;) &#125;);</div><div class="line">      m19 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;notify&quot;, new Class[0]);</div><div class="line">      m12 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;CGLIB$SET_THREAD_CALLBACKS&quot;, new Class[] &#123; Class.forName(&quot;[Lnet.sf.cglib.proxy.Callback;&quot;) &#125;);</div><div class="line">      m4 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;newInstance&quot;, new Class[] &#123; Class.forName(&quot;[Ljava.lang.Class;&quot;), Class.forName(&quot;[Ljava.lang.Object;&quot;), Class.forName(&quot;[Lnet.sf.cglib.proxy.Callback;&quot;) &#125;);</div><div class="line">      m17 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;wait&quot;, new Class[] &#123; Long.TYPE &#125;);</div><div class="line">      m6 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;create&quot;, new Class[0]);</div><div class="line">      m16 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;wait&quot;, new Class[] &#123; Long.TYPE, Integer.TYPE &#125;);</div><div class="line">      m8 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;CGLIB$findMethodProxy&quot;, new Class[] &#123; Class.forName(&quot;net.sf.cglib.core.Signature&quot;) &#125;);</div><div class="line">      m10 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;getCallbacks&quot;, new Class[0]);</div><div class="line">      m5 = Class.forName(&quot;com.xiaocao.proxy.cglib.BookServiceBean$$EnhancerByCGLIB$$f2cd59c6&quot;).getMethod(&quot;newInstance&quot;, new Class[] &#123; Class.forName(&quot;net.sf.cglib.proxy.Callback&quot;) &#125;);</div><div class="line">      return;</div><div class="line">    &#125;</div><div class="line">    catch (NoSuchMethodException localNoSuchMethodException)</div><div class="line">    &#123;</div><div class="line">      throw new NoSuchMethodError(localNoSuchMethodException.getMessage());</div><div class="line">    &#125;</div><div class="line">    catch (ClassNotFoundException localClassNotFoundException)</div><div class="line">    &#123;</div><div class="line">      throw new NoClassDefFoundError(localClassNotFoundException.getMessage());</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+</blockquote>
+<h3 id="4-4-补充"><a href="#4-4-补充" class="headerlink" title="4.4 补充"></a>4.4 补充</h3><blockquote>
+<p>现在，如果我们需要进行半开放的权限验证，也就是<strong>对于create需要权限验证，而对已query则不需要</strong>。<br>当然，我们完全可以在MyCglibProxy的intercept方法进行判断，如果是create方法才进行验证。这样做是可行的，但是似乎有点<strong>违反单一职责的编程原则</strong>，更好的方法应该是引入<strong>filter机制</strong>，实现<strong>过滤验证</strong>。下面我们将引入一个MyProxyFilter 类。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">package com.xiaocao.proxy.cglib;</div><div class="line"></div><div class="line">import java.lang.reflect.Method;</div><div class="line"></div><div class="line">import net.sf.cglib.proxy.CallbackFilter;</div><div class="line"></div><div class="line">public class MyProxyFilter implements CallbackFilter&#123;</div><div class="line"></div><div class="line">	@Override</div><div class="line">	public int accept(Method method) &#123;</div><div class="line">		if(!&quot;query&quot;.equalsIgnoreCase(method.getName()))     </div><div class="line">            return 0;     </div><div class="line">        return 1;  </div><div class="line">	&#125;	</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>另外，我们需要将此拦截器应用到工厂方法中，让其生效。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Enhancer enhancer = new Enhancer();</div><div class="line">		// 将Enhancer中的superclass属性赋值成BookServiceBean</div><div class="line">		enhancer.setSuperclass(BookServiceBean.class);</div><div class="line">		// 将Enhancer中的callbacks属性赋值成myProxy</div><div class="line">		enhancer.setCallbacks(new Callback[]&#123;myProxy,NoOp.INSTANCE&#125;);</div><div class="line">		// 将Enhancer中的callbackfilter属性赋值成MyProxyFilter</div><div class="line">		enhancer.setCallbackFilter(new MyProxyFilter());</div><div class="line">		return (BookServiceBean) enhancer.create();</div></pre></td></tr></table></figure></p>
+<p>接下来就是测试了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">BookServiceBean service = BookServiceFactory.getProxyInstance(new MyCglibProxy(&quot;张三&quot;));  </div><div class="line">		service.create(); </div><div class="line">	</div><div class="line">		BookServiceBean service2 = BookServiceFactory.getProxyInstance(new MyCglibProxy(&quot;李四&quot;));  </div><div class="line">		service2.create();</div><div class="line">		service2.query();</div></pre></td></tr></table></figure></p>
+<p>输出结果为：<br><img src="http://img.blog.csdn.net/20160516182207600" alt="这里写图片描述"></p>
+<p><strong>注意:</strong> setCallbacks中定义了所使用的拦截器，其中NoOp.INSTANCE是CGlib所提供的实际是一个没有任何操作的拦截器，<br>   <strong>他们是有序的,一定要和CallbackFilter里面的顺序一致</strong>。上面return返回(0/1)的就是返回的顺序。也就是说如果调用query方法就使用NoOp.INSTANCE进行拦截。</p>
+<h2 id="五、动态代理的认识"><a href="#五、动态代理的认识" class="headerlink" title="五、动态代理的认识"></a>五、动态代理的认识</h2><p>动态代理的实现可以说是一个比较综合的Java技术应用实现，他的作用是显著的，完全提供了一种AOP面向切面编程的可行性，也为远程过程调用提供了基础支持。总结一下运用的知识：</p>
+<ol>
+<li><strong>多态和继承</strong>。代理对象和被代理对象的继承关系，实现了重写被代理对象所有方法，有选择性的运行逻辑代码。另外，工厂返回的是子类，让使用者就像调用被代理对象一样方便，这也是多态的体现。</li>
+<li><strong>反射机制</strong>。动态代理里面大量运用了反射机制，比如对被代理对象的反射，对代理对象的class进行反射，对调用父类方法的反射等等。</li>
+<li><strong>动态生成class</strong>。这里需要了解JVM生成calss很多细节，好在CGLIB做到了很好的封装底层的ASM实现。这也是实现动态代理的核心。<h2 id="六、优缺点"><a href="#六、优缺点" class="headerlink" title="六、优缺点"></a>六、优缺点</h2><strong>优点</strong><br>有点是显然的，这里就不在赘述了，前面提到很多次了。<br><strong>缺点</strong></li>
+<li>因为动态代理的底层实现需要用到反射机制和动态生成并加载class，所以<strong>效率会大打折扣</strong>。<br>所以，在我们实际应用中，<strong>应该谨慎使用</strong>。</li>
+<li>应为需要重写被代理对象的所有方法，且需要继承被代理对象。所以<strong>被代理对象必须不能是fianl修饰</strong>的，<strong>属性方法都不可以</strong>。另外，java也有一套实现动态代理的机制，这里就不在赘述了。需要注意的是，java的动态代理与CGLIB不同，<strong>java的实现需要被代理对象实现指定的接口</strong>。</li>
+</ol>
+</blockquote>
+<p>在此感谢<a href="http://blog.csdn.net/xiaohai0504/article/details/6832990" target="_blank" rel="external">山的那边——cglib动态代理介绍（一）</a>。</p>
+<hr>
+<blockquote>
+<p><strong>注意</strong>：转载请标明，转自<a href="http://muxiaocao.cn" target="_blank" rel="external">itboy-木小草</a>。<br><strong>尊重原创，尊重技术。</strong></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/%E5%BE%AE%E4%BF%A1.png" alt="木小草 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/%E6%94%AF%E4%BB%98%E5%AE%9D.jpg" alt="木小草 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式/" rel="tag">#设计模式</a>
+          
+            <a href="/tags/动态代理/" rel="tag">#动态代理</a>
+          
+            <a href="/tags/cglib/" rel="tag">#cglib</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/01/类的设计(UML)/" rel="next" title="系统架构设计——类的设计（UML）">
+                <i class="fa fa-chevron-left"></i> 系统架构设计——类的设计（UML）
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/16/设计模式之代理模式（一）/" rel="prev" title="系统架构设计——设计模式之代理模式（一）">
+                系统架构设计——设计模式之代理模式（一） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/"
+           data-title="设计模式之代理模式（二）CGLIB动态代理实现" data-url="http://yoursite.com/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/avatar.png"
+               alt="木小草" />
+          <p class="site-author-name" itemprop="name">木小草</p>
+          <p class="site-description motion-element" itemprop="description">Java Linux 算法 架构</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MuXiaoCao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3128404817/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              个人链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://muxiaocao.cn/me" title="我的个人主页" target="_blank">我的个人主页</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://muqiangwei.cn" title="她的个人主页" target="_blank">她的个人主页</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、动态代理概述"><span class="nav-number">1.</span> <span class="nav-text">一、动态代理概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-动态代理的原理"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 动态代理的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-CGLIB动态代理的底层实现"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 CGLIB动态代理的底层实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、应用场景"><span class="nav-number">2.</span> <span class="nav-text">二、应用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、结构图"><span class="nav-number">3.</span> <span class="nav-text">三、结构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、实际例子"><span class="nav-number">4.</span> <span class="nav-text">四、实际例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-需求：为自定义的BookServiceBean动态生成代理对象，实现权限管理，只允许姓名为张三的对象可以操作。"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 需求：为自定义的BookServiceBean动态生成代理对象，实现权限管理，只允许姓名为张三的对象可以操作。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-代码示例"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 代码示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-测试结果"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 测试结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-补充"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 补充</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、动态代理的认识"><span class="nav-number">5.</span> <span class="nav-text">五、动态代理的认识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、优缺点"><span class="nav-number">6.</span> <span class="nav-text">六、优缺点</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">木小草</span>
+</div>
+<div>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+<span id="busuanzi_container_site_uv">
+  本站访客数<span id="busuanzi_value_site_uv"></span>人次
+</span>
+</div>
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"muxiaocao"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("n0ekDjstRAfmvxAbvhQfQGCv-gzGzoHsz", "qg1MGh57NY3eWBJfnAdltsRm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
