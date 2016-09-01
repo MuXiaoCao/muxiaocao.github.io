@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="博客搭建,Git使用,Hexo" />
+  <meta name="keywords" content="UML,类设计" />
 
 
 
@@ -84,61 +84,33 @@
 
 
 
-<meta name="description" content="准备阶段：
+<meta name="description" content="概述
+“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        
 
-1. 安装git客户端
-2. 安装node
-3. 准备好属于自己的域名，最好有自己的服务器
-4. 申请github账号
-安装和配置Hexo
-打开Git-bash或者cmd，输入
-1npm install -g hexo-cli
-
-本地建站
- 选择一个文件夹下，使用如下命令： hexo init npm install 如果hexo安装成功，则会在该目录下生成如下的目录结构 
-
-本地">
+对于初学者来说，我们不仅仅是要学会面向对象的封装">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello Hexo">
-<meta property="og:url" content="http://yoursite.com/2016/08/26/hexo博客搭建/index.html">
+<meta property="og:title" content="系统架构设计——类的设计（UML）">
+<meta property="og:url" content="http://yoursite.com/2016/05/01/类的设计(UML)/index.html">
 <meta property="og:site_name" content="ITBoy | 木小草">
-<meta property="og:description" content="准备阶段：
+<meta property="og:description" content="概述
+“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        
 
-1. 安装git客户端
-2. 安装node
-3. 准备好属于自己的域名，最好有自己的服务器
-4. 申请github账号
-安装和配置Hexo
-打开Git-bash或者cmd，输入
-1npm install -g hexo-cli
-
-本地建站
- 选择一个文件夹下，使用如下命令： hexo init npm install 如果hexo安装成功，则会在该目录下生成如下的目录结构 
-
-本地">
-<meta property="og:image" content="http://i.imgur.com/YxvWsWf.png">
-<meta property="og:image" content="http://i.imgur.com/7qp42fz.png">
-<meta property="og:image" content="http://i.imgur.com/kDYceNd.png">
-<meta property="og:image" content="http://i.imgur.com/tuiyoWD.png">
-<meta property="og:image" content="http://i.imgur.com/5jtBn7m.png">
-<meta property="og:updated_time" content="2016-08-29T01:59:36.138Z">
+对于初学者来说，我们不仅仅是要学会面向对象的封装">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501142107696">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501142402462">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501143153622">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501143830688">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501150653010">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501152027500">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501152857629">
+<meta property="og:updated_time" content="2016-08-29T02:02:05.680Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello Hexo">
-<meta name="twitter:description" content="准备阶段：
+<meta name="twitter:title" content="系统架构设计——类的设计（UML）">
+<meta name="twitter:description" content="概述
+“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        
 
-1. 安装git客户端
-2. 安装node
-3. 准备好属于自己的域名，最好有自己的服务器
-4. 申请github账号
-安装和配置Hexo
-打开Git-bash或者cmd，输入
-1npm install -g hexo-cli
-
-本地建站
- 选择一个文件夹下，使用如下命令： hexo init npm install 如果hexo安装成功，则会在该目录下生成如下的目录结构 
-
-本地">
-<meta name="twitter:image" content="http://i.imgur.com/YxvWsWf.png">
+对于初学者来说，我们不仅仅是要学会面向对象的封装">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160501142107696">
 
 
 
@@ -159,9 +131,9 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/08/26/hexo博客搭建/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/05/01/类的设计(UML)/"/>
 
-  <title> Hello Hexo | ITBoy | 木小草 </title>
+  <title> 系统架构设计——类的设计（UML） | ITBoy | 木小草 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -327,7 +299,7 @@
             
             
               
-                Hello Hexo
+                系统架构设计——类的设计（UML）
               
             
           </h1>
@@ -339,8 +311,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-08-26T00:00:00+08:00" content="2016-08-26">
-              2016-08-26
+            <time itemprop="dateCreated" datetime="2016-05-01T00:00:00+08:00" content="2016-05-01">
+              2016-05-01
             </time>
           </span>
 
@@ -353,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Git/" itemprop="url" rel="index">
-                    <span itemprop="name">Git</span>
+                  <a href="/categories/系统架构设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统架构设计</span>
                   </a>
                 </span>
 
@@ -369,8 +341,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/08/26/hexo博客搭建/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/26/hexo博客搭建/" itemprop="commentsCount"></span>
+                <a href="/2016/05/01/类的设计(UML)/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/类的设计(UML)/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -380,7 +352,7 @@
 	
           
           
-             <span id="/2016/08/26/hexo博客搭建/" class="leancloud_visitors" data-flag-title="Hello Hexo">
+             <span id="/2016/05/01/类的设计(UML)/" class="leancloud_visitors" data-flag-title="系统架构设计——类的设计（UML）">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -402,81 +374,42 @@
       
 
       
-        <blockquote>
-<p>准备阶段：</p>
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        </p>
 </blockquote>
-<pre><code>1. 安装git客户端
-2. 安装node
-3. 准备好属于自己的域名，最好有自己的服务器
-4. 申请github账号
-</code></pre><h1 id="安装和配置Hexo"><a href="#安装和配置Hexo" class="headerlink" title="安装和配置Hexo"></a>安装和配置Hexo</h1><ol>
-<li><p>打开Git-bash或者cmd，输入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install -g hexo-cli</div></pre></td></tr></table></figure>
-</li>
-<li><p>本地建站</p>
-<p> 选择一个文件夹下，使用如下命令：<br> <code>hexo init</code><br> <code>npm install</code><br> 如果hexo安装成功，则会在该目录下生成如下的目录结构<br> <img src="http://i.imgur.com/YxvWsWf.png" alt=""></p>
-</li>
-<li><p>本地测试</p>
-<p> <code>hexo s</code><br> 提示：<br> <img src="http://i.imgur.com/7qp42fz.png" alt=""><br> 接下来就可以使用浏览器访问啦！不过现在是本地的，如果想放到万维网并使用自己的域名就需要配合github了。</p>
-<h1 id="主题更换"><a href="#主题更换" class="headerlink" title="主题更换"></a>主题更换</h1><blockquote>
-<p>clone主题代码到git上</p>
+<p>对于初学者来说，我们不仅仅是要学会面向对象的封装、继承和多态，我们更应该在理解的基础上把这些思想运用到我们的编码当中。在我学习过JAVA过后的很长一段时间，很少真正思考过，类与类之间除了继承、实现和隶属（包含）的关系还有哪些。而当我碰到问题的时候再去思考如何更改类的设计。所以在我们开始整个项目之前，我们应该尽可能的想好每一个类该如何去设计，类与类该如何处理他们的关系，这样我们再进行模式和业务设计的时候才不至于遇到问题了再重新思考。这也是实现代码复用，实现高内聚低耦合的必要条件。</p>
+<p><strong>下面我们从UML的类图出发，学习一下类的设计</strong></p>
+<h3 id="1-类-class"><a href="#1-类-class" class="headerlink" title="1. 类(class)"></a>1. 类(class)</h3><blockquote>
+<p>在我看来，类可以看做面向对象程序设计的单位，是封装、继承和多态的最小元素。在面向对象的思想中，一切万物皆对象。<br>在UML中类图分三层，第一层显示类的名称，如果是抽象类，则就用斜体显示。第二层是类的特性，通常就是字段和属性。第三层是类的操作，通常是方法和行为。<br>其中，“＋”表示public，“－”表示private，“#”表示protected。<br><img src="http://img.blog.csdn.net/20160501142107696" alt="这里写图片描述"></p>
 </blockquote>
-</li>
+<h3 id="2-继承-extend"><a href="#2-继承-extend" class="headerlink" title="2. 继承(extend)"></a>2. 继承(extend)</h3><blockquote>
+<p>这是面向对象程序设计的三大特性之一。在UML中使用三角形和实线来表示的。<br><img src="http://img.blog.csdn.net/20160501142402462" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public class Bird extend Animal</div><div class="line">&#123;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="3-实现-implements"><a href="#3-实现-implements" class="headerlink" title="3. 实现(implements)"></a>3. 实现(implements)</h3><blockquote>
+<p>Java接口是一系列方法的声明，是一些方法特征的集合，一个接口只有方法的特征没有方法的实现，因此这些方法可以在不同的地方被不同的类实现，而这些实现可以具有不同的行为（功能）。<br><img src="http://img.blog.csdn.net/20160501143153622" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class Bird extend Animal implements Flyable</div><div class="line">&#123;</div><div class="line">	public void fly()&#123;</div><div class="line">		...</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public interface Flyable</div><div class="line">&#123;</div><div class="line">	public abstract void fly();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="4-依赖-Dependency"><a href="#4-依赖-Dependency" class="headerlink" title="4. 依赖(Dependency)"></a>4. 依赖(Dependency)</h3><blockquote>
+<p>依赖可以按照必要条件来理解，简单地理解就是<strong>依存的关系</strong>，但不是相互依存。一般此关系表示在构造方法中，以参数的形式传入。这就表达了如果没有参数，那么也就无从构造的依存关系。<br><img src="http://img.blog.csdn.net/20160501143830688" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class Animal</div><div class="line">&#123;</div><div class="line">	private Oxygen oxygen = null;</div><div class="line">	private Water water = null;</div><div class="line">	public Animal(Oxygen o,Water w)&#123;</div><div class="line">		this.oxygen = o;</div><div class="line">		this.water = w;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="5-组合-Composition"><a href="#5-组合-Composition" class="headerlink" title="5. 组合(Composition)"></a>5. 组合(Composition)</h3><blockquote>
+<p>组合关系也是一种强的”拥有”关系，与依赖不同的是，组合中的组件是可以是由自身创建的。按前面的例子来说，<strong>依赖关系的两者其实是独立产生的，只是一方的存在依赖于另一方</strong>。而<strong>组合中的双方，是一方拥有另一方，体现了严格的部分和整体的关系，部分和整体的生命周期一致</strong>。<br><img src="http://img.blog.csdn.net/20160501150653010" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public class Bird</div><div class="line">&#123;</div><div class="line">	private Wing wing;</div><div class="line">	public Bird()&#123;</div><div class="line">		wing = new Wing();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public class Wing</div><div class="line">&#123;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="6-聚合-Aggregation"><a href="#6-聚合-Aggregation" class="headerlink" title="6. 聚合(Aggregation)"></a>6. 聚合(Aggregation)</h3><blockquote>
+<p>聚合表示一种弱的“拥有”关系，体现的是A对象可以包含B对象，但B对象不是A对象的一部分。<strong>相比于上面的组成关系，区别在于组成关系的组件的生命周期与整体是相同的</strong>，如果鸟死了，那么他的翅膀也就不能用了(如果你认为死去鸟的翅膀还可以移植到别的鸟身上继续使用，那么鸟和翅膀其实就是聚合关系，具体的解释稍后再说)。而<strong>聚合关系中的整体和部分是相对弱化的，就像鸟群是有鸟组成的，如果没有鸟群，鸟还是鸟</strong>。<br><img src="http://img.blog.csdn.net/20160501152027500" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class Bery</div><div class="line">&#123;</div><div class="line">	private Bird[] arrayBirds;</div><div class="line">	public abstract void SouthwardMigration();</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="7-关联-Association"><a href="#7-关联-Association" class="headerlink" title="7. 关联(Association)"></a>7. 关联(Association)</h3><blockquote>
+<p>类与类之间的联接，它使一个类知道另一个类的属性和方法。例如如果A依赖于B，则B体现为A的全局变量。关联关系有双向关联和单向关联。双向关联：两个类都知道另一个类的公共属性和操作。单向关联：只有一个类知道另外一个类的公共属性和操作。大多数关联应该是单向的，单向关系更容易建立和维护，有助于寻找可服用的类。关联关系在所有的关系中属于最弱的关系。<br><img src="http://img.blog.csdn.net/20160501152857629" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class Bird</div><div class="line">&#123;</div><div class="line">	private Climate climate;</div><div class="line">&#125;</div><div class="line">public class Climate</div><div class="line">&#123;</div><div class="line">	private String season;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="8-关联、聚合、组合、依赖之间的关系"><a href="#8-关联、聚合、组合、依赖之间的关系" class="headerlink" title="8. 关联、聚合、组合、依赖之间的关系"></a>8. 关联、聚合、组合、依赖之间的关系</h3><blockquote>
+<p>他们各自的定义之前都说过了，这里只是想说一个问题，就是四者的关系其实都是相对的，这里拿男女关系做一个比喻，相比大家能更好的理解：</p>
+<ol>
+<li>男女关系最开始的时候，双方刚刚认识，这时候要么男方对女方有意思，要么女方对男方有意思，再或者双方都有好感，那么双方的关系就是关联关系，只是单纯的把对方留意一下。这就是关联关系，只是一方知道另一方。</li>
+<li>通常来说，我们的异性朋友不止一个，即便是男方对女方有意思，女方也是男方众多异性朋友中的一个，女方亦然。这些异性朋友其实就是一个聚合。所以，如果站在女方的角度，她和男方是关联的关系，如果站在异性朋友的角度，女方只是男方的异性朋友之一，女方和异性朋友就是聚合关系。这也就说明了，关系其实都是相对的。</li>
+<li>接下来，双方结果相恋、相爱，最后走入婚姻的殿堂，组成了他们的家庭。这时候站在家庭的角度，他们和家庭之间就是一种组合关系。值得注意的是，如果家庭破裂了，丈夫和妻子的角色也就不存在了。严格体现了整体和部分的关系，生命周期是一样的。</li>
+<li>家庭的维持是需要收入来源的，一般来说，男方是这个家庭的顶梁柱，那么家庭相对于男方的关系就是依赖关系。而家庭破裂了，男方一样有经济来源，所以二者的生命周期是不一样的。</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://..</div></pre></td></tr></table></figure>
-<blockquote>
-<p>修改config.yml配置文件</p>
 </blockquote>
-<pre><code>将里面的theme: 的值改为对应的主题
-</code></pre><blockquote>
-<p>提交代码</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">git add .</div><div class="line">commit -m &quot;备注&quot;</div><div class="line">git push origin master</div></pre></td></tr></table></figure>
-<blockquote>
-<p>发布和测试</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo d -g //会出现很多文件</div><div class="line">hexo s</div></pre></td></tr></table></figure>
-<h1 id="使用Github-Pages"><a href="#使用Github-Pages" class="headerlink" title="使用Github Pages"></a>使用Github Pages</h1><ol>
-<li>在自己的github上创建名为xxx.github.io的repository</li>
-<li>设置repository的pages，具体操作去github官网查看（可以设置上自己的域名）</li>
-<li>创建CNMAE文件，写入自己的域名</li>
-<li><p>将本地hexo根目录下的<code>_config.yml</code>中的如下位置，填写自己的信息</p>
-<p> <img src="http://i.imgur.com/kDYceNd.png" alt=""> </p>
-</li>
-<li><p>将上一步的hexo代码上传到repository</p>
-<p> <code>git status</code> 查看状态</p>
-<p> <code>git add .</code></p>
-<p> <code>git commit -m &quot;备注&quot;</code></p>
-<p> <code>git pull origin master</code></p>
-<p> <code>git push origin master</code></p>
-</li>
-<li><p>发布</p>
-<p> <code>hexo d -g</code></p>
-<blockquote>
-<p>这时候，就可以用repository名，也就是xxx.github.io进行访问了。</p>
-</blockquote>
-</li>
-</ol>
-<h1 id="域名解析设置"><a href="#域名解析设置" class="headerlink" title="域名解析设置"></a>域名解析设置</h1><p>如下图：<br><img src="http://i.imgur.com/tuiyoWD.png" alt=""></p>
-<p>设置好后，大约十分钟，便可用域名访问啦！</p>
-<h1 id="发表文章"><a href="#发表文章" class="headerlink" title="发表文章"></a>发表文章</h1><blockquote>
-<p>发表文章操作非常简单，在网站存放的根目录打开git bash，输入</p>
-</blockquote>
-<pre><code>hexo n &quot;name of the new post&quot;
-</code></pre><blockquote>
-<p>回车后，在source文件夹下的_post文件夹下，可以看到新建了一个name of the new post.md的文件，打开填写文件头信息<br><img src="http://i.imgur.com/5jtBn7m.png" alt=""></p>
-<p>可以给文章贴上相应的tags，如有多个则按照如下格式</p>
-</blockquote>
-<p><code>[tag1, tag2, tag3, ...]</code></p>
-<blockquote>
-<p>　在- - -下方添加正文内容即可，注意需要使用markdown语法进行书写。在这里有关于Markdown语法的简单说明。推荐使用CMDmarkdown进行md文件的编辑工作。<br>文章撰写完成后保存，输入</p>
-</blockquote>
-<pre><code>hexo g -d
-</code></pre><blockquote>
-<p>即可生成新网站，并且同步Github上的网站内容。</p>
-</blockquote>
-<hr>
-<blockquote>
+<h2 id="至此，我们就要进入下一阶段的学习了——设计模式。"><a href="#至此，我们就要进入下一阶段的学习了——设计模式。" class="headerlink" title="至此，我们就要进入下一阶段的学习了——设计模式。"></a>至此，我们就要进入下一阶段的学习了——设计模式。</h2><blockquote>
 <p><strong>注意</strong>：转载请标明，转自<a href="http://muxiaocao.cn" target="_blank" rel="external">itboy-木小草</a>。<br><strong>尊重原创，尊重技术。</strong></p>
 </blockquote>
 
@@ -522,11 +455,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/博客搭建/" rel="tag">#博客搭建</a>
+            <a href="/tags/UML/" rel="tag">#UML</a>
           
-            <a href="/tags/Git使用/" rel="tag">#Git使用</a>
-          
-            <a href="/tags/Hexo/" rel="tag">#Hexo</a>
+            <a href="/tags/类设计/" rel="tag">#类设计</a>
           
         </div>
       
@@ -535,13 +466,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/20/同步互斥/" rel="next" title="漫谈Java中的互斥同步">
-                <i class="fa fa-chevron-left"></i> 漫谈Java中的互斥同步
-              </a>
-            
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/" rel="prev" title="设计模式之代理模式（二）CGLIB动态代理实现">
+                设计模式之代理模式（二）CGLIB动态代理实现 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -567,8 +498,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/08/26/hexo博客搭建/"
-           data-title="Hello Hexo" data-url="http://yoursite.com/2016/08/26/hexo博客搭建/">
+      <div class="ds-thread" data-thread-key="2016/05/01/类的设计(UML)/"
+           data-title="系统架构设计——类的设计（UML）" data-url="http://yoursite.com/2016/05/01/类的设计(UML)/">
       </div>
     
   </div>
@@ -697,7 +628,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装和配置Hexo"><span class="nav-number">1.</span> <span class="nav-text">安装和配置Hexo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#主题更换"><span class="nav-number">2.</span> <span class="nav-text">主题更换</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用Github-Pages"><span class="nav-number">3.</span> <span class="nav-text">使用Github Pages</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#域名解析设置"><span class="nav-number">4.</span> <span class="nav-text">域名解析设置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#发表文章"><span class="nav-number">5.</span> <span class="nav-text">发表文章</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-类-class"><span class="nav-number">2.</span> <span class="nav-text">1. 类(class)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-继承-extend"><span class="nav-number">3.</span> <span class="nav-text">2. 继承(extend)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-实现-implements"><span class="nav-number">4.</span> <span class="nav-text">3. 实现(implements)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-依赖-Dependency"><span class="nav-number">5.</span> <span class="nav-text">4. 依赖(Dependency)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-组合-Composition"><span class="nav-number">6.</span> <span class="nav-text">5. 组合(Composition)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-聚合-Aggregation"><span class="nav-number">7.</span> <span class="nav-text">6. 聚合(Aggregation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-关联-Association"><span class="nav-number">8.</span> <span class="nav-text">7. 关联(Association)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-关联、聚合、组合、依赖之间的关系"><span class="nav-number">9.</span> <span class="nav-text">8. 关联、聚合、组合、依赖之间的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#至此，我们就要进入下一阶段的学习了——设计模式。"><span class="nav-number"></span> <span class="nav-text">至此，我们就要进入下一阶段的学习了——设计模式。</span></a></div>
             
           </div>
         </section>
