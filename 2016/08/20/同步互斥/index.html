@@ -86,7 +86,7 @@
 
 <meta name="description" content="互斥同步（Mutual Exclusion &amp;amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面">
 <meta property="og:type" content="article">
-<meta property="og:title" content="漫谈Java中的互斥同步">
+<meta property="og:title" content="JAVA编程——漫谈Java中的互斥同步">
 <meta property="og:url" content="http://yoursite.com/2016/08/20/同步互斥/index.html">
 <meta property="og:site_name" content="ITBoy | 木小草">
 <meta property="og:description" content="互斥同步（Mutual Exclusion &amp;amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面">
@@ -100,9 +100,9 @@
 <meta property="og:image" content="http://cdn1.infoqstatic.com/statics_s1_20160823-0357/resource/articles/ConcurrentHashMap/zh/resources/1.jpg">
 <meta property="og:image" content="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/currenthashmap%E7%BB%93%E6%9E%84%E5%9B%BE.png">
 <meta property="og:image" content="http://img.blog.csdn.net/20160824205606343">
-<meta property="og:updated_time" content="2016-09-07T08:23:27.367Z">
+<meta property="og:updated_time" content="2016-09-07T08:47:08.292Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="漫谈Java中的互斥同步">
+<meta name="twitter:title" content="JAVA编程——漫谈Java中的互斥同步">
 <meta name="twitter:description" content="互斥同步（Mutual Exclusion &amp;amp; Synchronization）是最常见的一种并发正确性保证手段，同步是指在多个线程并发访问共享数据时，保证共享数据在同一时刻只被一条（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Sempahore）都是主要的互斥实现方式。因此，在这四个字里面">
 <meta name="twitter:image" content="http://img.blog.csdn.net/20160824210012602">
 
@@ -127,7 +127,7 @@
 
   <link rel="canonical" href="http://yoursite.com/2016/08/20/同步互斥/"/>
 
-  <title> 漫谈Java中的互斥同步 | ITBoy | 木小草 </title>
+  <title> JAVA编程——漫谈Java中的互斥同步 | ITBoy | 木小草 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -293,7 +293,7 @@
             
             
               
-                漫谈Java中的互斥同步
+                JAVA编程——漫谈Java中的互斥同步
               
             
           </h1>
@@ -346,7 +346,7 @@
 	
           
           
-             <span id="/2016/08/20/同步互斥/" class="leancloud_visitors" data-flag-title="漫谈Java中的互斥同步">
+             <span id="/2016/08/20/同步互斥/" class="leancloud_visitors" data-flag-title="JAVA编程——漫谈Java中的互斥同步">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -629,8 +629,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/15/Redis做MyBatis的二级缓存/" rel="next" title="系统架构设计——使用Redis做MyBatis的二级缓存">
-                <i class="fa fa-chevron-left"></i> 系统架构设计——使用Redis做MyBatis的二级缓存
+              <a href="/2016/08/15/Redis做MyBatis的二级缓存/" rel="next" title="分布式架构——使用Redis做MyBatis的二级缓存">
+                <i class="fa fa-chevron-left"></i> 分布式架构——使用Redis做MyBatis的二级缓存
               </a>
             
           </div>
@@ -666,7 +666,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/08/20/同步互斥/"
-           data-title="漫谈Java中的互斥同步" data-url="http://yoursite.com/2016/08/20/同步互斥/">
+           data-title="JAVA编程——漫谈Java中的互斥同步" data-url="http://yoursite.com/2016/08/20/同步互斥/">
       </div>
     
   </div>
@@ -711,7 +711,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-count">11</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -719,7 +719,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -728,7 +728,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-count">33</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
