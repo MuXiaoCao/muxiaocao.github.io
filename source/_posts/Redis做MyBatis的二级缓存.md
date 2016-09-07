@@ -1,7 +1,7 @@
 ---
-title: 系统架构设计——使用Redis做MyBatis的二级缓存
+title: 分布式架构——使用Redis做MyBatis的二级缓存
 date:  2016-08-15
-categories:  系统架构设计
+categories:  分布式架构
 keywords:  [锁,ReentrantLock, AQS, 并发包]
 tags: 
 	- redis

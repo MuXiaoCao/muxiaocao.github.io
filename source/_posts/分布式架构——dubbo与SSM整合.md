@@ -1,7 +1,7 @@
 ---
-title: 系统架构设计——dubbo与SSM整合
+title: 分布式架构——dubbo与SSM整合
 date:  2016-06-02
-categories:  系统架构设计
+categories:  分布式架构
 keywords:  [dubbo,SOA, SSM, 服务化,RPC]
 tags: 
 	- dubbo
@@ -212,5 +212,5 @@ public class Consumer {
 **文章中源码下载地址：[请点击](https://github.com/MuXiaoCao/DubboDemo)**
 **有关dubbo的独立服务的文章：**[请点击](http://blog.csdn.net/wilsonke/article/details/39935801)
   -------------------------------------------
-  >**注意**：转载请标明，转自[itboy-木小草](http://muxiaocao.cn/)。
+  >**注意**：转载请标明，转自[itboy-木小草](http://muxiaocao.cn/2016/06/02/分布式架构——dubbo与SSM整合/)。
 >**尊重原创，尊重技术。**
