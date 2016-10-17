@@ -1,0 +1,879 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hadoop,RPC" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/blogICO.png?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="前几天在学习Hadoop的时候，学到了他的RPC机制，即RPC（Remote Procedure Call Protocol）——远程过程调用协议。以便日后的学习，在此记录一下学习心得。
+
+
+  在我看来，RPC的本质其实和JMS消息队列，WebService一样。都是两个主机，两个线程之间通信问题，不一样的就是通信的内容不同而已。  RPC是通过动态代理，利用socket通信，实现方法体的异地">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大数据——Hadoop中的RPC">
+<meta property="og:url" content="http://yoursite.com/2016/04/03/大数据——Hadoop中的RPC/index.html">
+<meta property="og:site_name" content="ITBoy | 木小草">
+<meta property="og:description" content="前几天在学习Hadoop的时候，学到了他的RPC机制，即RPC（Remote Procedure Call Protocol）——远程过程调用协议。以便日后的学习，在此记录一下学习心得。
+
+
+  在我看来，RPC的本质其实和JMS消息队列，WebService一样。都是两个主机，两个线程之间通信问题，不一样的就是通信的内容不同而已。  RPC是通过动态代理，利用socket通信，实现方法体的异地">
+<meta property="og:image" content="http://img.blog.csdn.net/20160403211108782">
+<meta property="og:image" content="http://img.blog.csdn.net/20160503102221966">
+<meta property="og:updated_time" content="2016-10-17T08:35:44.324Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大数据——Hadoop中的RPC">
+<meta name="twitter:description" content="前几天在学习Hadoop的时候，学到了他的RPC机制，即RPC（Remote Procedure Call Protocol）——远程过程调用协议。以便日后的学习，在此记录一下学习心得。
+
+
+  在我看来，RPC的本质其实和JMS消息队列，WebService一样。都是两个主机，两个线程之间通信问题，不一样的就是通信的内容不同而已。  RPC是通过动态代理，利用socket通信，实现方法体的异地">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160403211108782">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/04/03/大数据——Hadoop中的RPC/"/>
+
+  <title> 大数据——Hadoop中的RPC | ITBoy | 木小草 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5fdf6a8183b8779743368e6228b4ceec";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=58122117";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+    <div class="site-meta-headline">
+      <a>
+        <img class="custom-logo-image" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/avatar1.png"
+             alt="ITBoy | 木小草"/>
+      </a>
+    </div>
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ITBoy | 木小草</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">求知若饥，虚心若愚。（Stay hungry. Stay foolish.）</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                大数据——Hadoop中的RPC
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-04-03T00:00:00+08:00" content="2016-04-03">
+              2016-04-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/大数据/" itemprop="url" rel="index">
+                    <span itemprop="name">大数据</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/04/03/大数据——Hadoop中的RPC/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/03/大数据——Hadoop中的RPC/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+	
+          
+          
+             <span id="/2016/04/03/大数据——Hadoop中的RPC/" class="leancloud_visitors" data-flag-title="大数据——Hadoop中的RPC">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>前几天在学习Hadoop的时候，学到了他的RPC机制，即RPC（Remote Procedure Call Protocol）——远程过程调用协议。以便日后的学习，在此记录一下学习心得。</p>
+</blockquote>
+<hr>
+<p>  在我看来，RPC的本质其实和JMS消息队列，WebService一样。都是两个主机，两个线程之间通信问题，不一样的就是通信的内容不同而已。<br>  RPC是通过动态代理，利用socket通信，实现方法体的异地调用。而JMS和WebService一个是实现消息的异地发送，一个是实现服务的异地发送。其实这些都是异地信息，只是信息的内容不一样而已。我们完全可以用JMS发送要调用打方法，返回方法的调用结果，实现和RPC同样的效果。为什么不这么做，只是他们都在各自领域有所长而已。</p>
+<p>##hadoop中的简单应用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 利用RPC，实现hadoop的下载</div><div class="line"> * @throws IllegalArgumentException</div><div class="line"> * @throws IOException</div><div class="line"> */</div><div class="line">@Test</div><div class="line">public void fileDownLoad() throws IllegalArgumentException, IOException &#123;</div><div class="line">	// 设置配置信息</div><div class="line">	Configuration conf = new Configuration();</div><div class="line">	conf.set(&quot;fs.defaultFS&quot;, &quot;hdfs://muxiaocao:9000/&quot;);</div><div class="line">	conf.set(&quot;dfs.replication&quot;, &quot;1&quot;);</div><div class="line">	/**</div><div class="line">	 *其实在得到Filesystem的时候就用到了RPC，</div><div class="line">	 * 这里的fs其实是FileSystem的实现类DistributedFileSystem，其中有个很重要的成员变量是DFSClient</div><div class="line">	 * </div><div class="line">	 * 而DFSClient中有个成员变量就是ClientProtocol namenode。</div><div class="line">	 * 这就是RPC的协议类接口，远程过程调用也是调用了他的远程实现方法。</div><div class="line">	 * </div><div class="line">	 * DFSClient中还有个SocketFactory，实现Socket传输信息。</div><div class="line">	 */</div><div class="line">	FileSystem fs = FileSystem.get(conf);</div><div class="line">	/**</div><div class="line">	 * 这里调用的FileSystem中的open方法，其实就是利用RPC调用的hdfs中的open实现方法，</div><div class="line">	 * 从而实现将hdfs中namenode的元数据，发送给客户端，</div><div class="line">	 * 客户端利用元数据中的信息，在到hdfs中的datanode中真正的下载所要的数据</div><div class="line">	 */</div><div class="line">	FSDataInputStream is = fs.open(new Path(&quot;hdfs://muxiaocao:9000/filefromlocal.xml&quot;));</div><div class="line">	FileOutputStream os = new FileOutputStream(new File(&quot;/home/muxiaocao/myFile/filefromhdfs.xml&quot;));</div><div class="line">	IOUtils.copy(is, os);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>  这样做的好处在于，可以高内聚、低耦合，完全把不相干的方法抽取出来放在其他主机上，而我们要用的时候，只是通知，然后接收结果信息。具体的方法实现，其实是在其他主机上的。RPC更是用上了动态代理，利用RpcProtocol起到通信协议的作用，在面向接口编程的方式下，让开发者也感觉是在本地调用方法一样，更不用说是使用者了。这样就近乎完美的达到了高内聚、低耦合的效果。<br>  我不禁回想自己学习IT技术的过程中，先是面向过程打C语言，把一行行代码，一个个方法堆砌成程序。再到基于过程的C++，利用结构体将一个个结构类似的代码块抽取出来。再到后来面向对象的Java，将对象的思想引用进来，把高内聚的变量和方法放在一起，实现对内隐藏细节，对外暴露接口。似乎语言或者IT的发展演进，就是朝着这个方向发展的。而RPC的思想，更是把这个思想提升到了分布式上，让低耦合的方法变成了异地的了。</p>
+<p>  我不禁大胆的想象了下，我们在做Web应用的时候，如果访问量很大，就像淘宝的双十一一样，我们完全可以利用这种思想，实现分布式构建的Web应用。具体来说，如果考虑到下单可能会并发度很高，服务器压力过大。我们就可以将下单模块集成出来放在多个服务器上，用一个或者几个服务器做controller，当下单请求过来的时候，考虑到service服务器的负载均衡进行任务的分派，当服务器压力到达预订阀值也可以开启其他服务器参与下单操作，实现服务器的横向扩展。而服务器间的通讯，就可以采用RPC的模式。</p>
+<p>##RPC的web应用<br><img src="http://img.blog.csdn.net/20160403211108782" alt="RPC的web应用"><br>  另外，我们现在很多的应用都支持第三方登录，其实这就应该是RPC思想的应用，只需要第三方给出对应的接口协议和访问服务器，我们就可以自己实现第三方的登录。</p>
+<p>###代码简单实现###</p>
+<p><strong>登录提供方服务器代码</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">package com.nanda.hadoop.muxiaocao.RPC;</div><div class="line"></div><div class="line">/**</div><div class="line"> * 登录接口</div><div class="line"> * @author muxiaocao</div><div class="line"> *</div><div class="line"> */</div><div class="line">public interface LoginServiceInterface &#123;</div><div class="line">	public static final long versionID = 1L;</div><div class="line">	public String login(String uname,String passwd);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">package com.nanda.hadoop.muxiaocao.RPC;</div><div class="line">/**</div><div class="line"> * 登录实现类</div><div class="line"> * @author muxiaocao</div><div class="line"> *</div><div class="line"> */</div><div class="line">public class LoginServiceImpl implements LoginServiceInterface&#123;</div><div class="line"></div><div class="line">	public String login(String uname, String passwd) &#123;</div><div class="line">		</div><div class="line">		return uname + &quot; 登陆成功！！！ &quot;;</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">package com.nanda.hadoop.muxiaocao.RPC;</div><div class="line"></div><div class="line">import java.io.IOException;</div><div class="line"></div><div class="line">import org.apache.hadoop.conf.Configuration;</div><div class="line">import org.apache.hadoop.ipc.RPC;</div><div class="line">import org.apache.hadoop.ipc.RPC.Builder;</div><div class="line">import org.apache.hadoop.ipc.RPC.Server;</div><div class="line">/**</div><div class="line"> * RPC服务</div><div class="line"> * @author muxiaocao</div><div class="line"> *</div><div class="line"> */</div><div class="line">public class MyRPCLoginService &#123;</div><div class="line">	public static void main(String[] args) throws Exception, IOException &#123;</div><div class="line">		Builder builder = new RPC.Builder(new Configuration());</div><div class="line">		builder.setPort(10000);</div><div class="line">		builder.setBindAddress(&quot;muxiaocao&quot;);</div><div class="line">		builder.setInstance(new LoginServiceImpl());</div><div class="line">		builder.setProtocol(LoginServiceInterface.class);</div><div class="line">		Server server = builder.build();</div><div class="line">		server.start();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>登录调用方服务器代码</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">package com.nanda.hadoop.muxiaocao.RPC.controller;</div><div class="line"></div><div class="line">import java.io.IOException;</div><div class="line">import java.net.InetSocketAddress;</div><div class="line"></div><div class="line">import org.apache.hadoop.conf.Configuration;</div><div class="line">import org.apache.hadoop.ipc.RPC;</div><div class="line"></div><div class="line">import com.nanda.hadoop.muxiaocao.RPC.LoginServiceInterface;</div><div class="line"></div><div class="line">public class MyRPCController &#123;</div><div class="line">	public static void main(String[] args) throws IOException &#123;</div><div class="line">		</div><div class="line">		LoginServiceInterface proxy = RPC.getProxy(LoginServiceInterface.class, 1L, new InetSocketAddress(</div><div class="line">				&quot;muxiaocao&quot;, 10000), new Configuration());</div><div class="line">		</div><div class="line">		System.out.println(proxy.login(&quot;muxiaocao&quot;, &quot;123&quot;));</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>###运行效果<br><img src="http://img.blog.csdn.net/20160503102221966" alt="这里写图片描述"></p>
+<blockquote>
+<p>右边是被调用端，开启服务后，为阻塞状态，一直监听10000端口。<br>左边是调用端，通过10000端口，调用接口的同时实现动态代理加socket网络通信，实现访问被调用端，并得到调用结果。整个过程丝毫没有远程调用的感觉，就像调用本地方法一样。</p>
+</blockquote>
+<h2 id="总结：技术其实就在那里，多不多少不少，只要我们思维足够开阔，就能够把一些简单的技术组合成一种让人耳目一新的技术。而在中国其实从不缺乏技术人才，而是缺乏技术的想象力，只有我们将已有的技术进行大胆的想象和组合，就能让我们的技术流行起来，让别人追赶我们的思维，而不是我们一直再用双手追赶别人的思维，这样是永远赶不上的。"><a href="#总结：技术其实就在那里，多不多少不少，只要我们思维足够开阔，就能够把一些简单的技术组合成一种让人耳目一新的技术。而在中国其实从不缺乏技术人才，而是缺乏技术的想象力，只有我们将已有的技术进行大胆的想象和组合，就能让我们的技术流行起来，让别人追赶我们的思维，而不是我们一直再用双手追赶别人的思维，这样是永远赶不上的。" class="headerlink" title="  总结：技术其实就在那里，多不多少不少，只要我们思维足够开阔，就能够把一些简单的技术组合成一种让人耳目一新的技术。而在中国其实从不缺乏技术人才，而是缺乏技术的想象力，只有我们将已有的技术进行大胆的想象和组合，就能让我们的技术流行起来，让别人追赶我们的思维，而不是我们一直再用双手追赶别人的思维，这样是永远赶不上的。"></a>  <strong>总结</strong>：技术其实就在那里，多不多少不少，只要我们思维足够开阔，就能够把一些简单的技术组合成一种让人耳目一新的技术。而在中国其实从不缺乏技术人才，而是缺乏技术的想象力，只有我们将已有的技术进行大胆的想象和组合，就能让我们的技术流行起来，让别人追赶我们的思维，而不是我们一直再用双手追赶别人的思维，这样是永远赶不上的。</h2><blockquote>
+<p><strong>注意</strong>：转载请标明，转自<a href="http://muxiaocao.cn" target="_blank" rel="external">itboy-木小草</a>。<br><strong>尊重原创，尊重技术。</strong></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/%E5%BE%AE%E4%BF%A1.png" alt="木小草 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/%E6%94%AF%E4%BB%98%E5%AE%9D.jpg" alt="木小草 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RPC/" rel="tag">#RPC</a>
+          
+            <a href="/tags/Hadoop/" rel="tag">#Hadoop</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/01/类的设计(UML)/" rel="prev" title="系统架构设计——类的设计（UML）">
+                系统架构设计——类的设计（UML） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/04/03/大数据——Hadoop中的RPC/"
+           data-title="大数据——Hadoop中的RPC" data-url="http://yoursite.com/2016/04/03/大数据——Hadoop中的RPC/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/avatar.png"
+               alt="木小草" />
+          <p class="site-author-name" itemprop="name">木小草</p>
+          <p class="site-description motion-element" itemprop="description">Java Linux 算法 架构</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MuXiaoCao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3128404817/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              个人链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://muxiaocao.cn/me" title="我的个人主页" target="_blank">我的个人主页</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://muqiangwei.cn" title="她的个人主页" target="_blank">她的个人主页</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#总结：技术其实就在那里，多不多少不少，只要我们思维足够开阔，就能够把一些简单的技术组合成一种让人耳目一新的技术。而在中国其实从不缺乏技术人才，而是缺乏技术的想象力，只有我们将已有的技术进行大胆的想象和组合，就能让我们的技术流行起来，让别人追赶我们的思维，而不是我们一直再用双手追赶别人的思维，这样是永远赶不上的。"><span class="nav-number">1.</span> <span class="nav-text">  总结：技术其实就在那里，多不多少不少，只要我们思维足够开阔，就能够把一些简单的技术组合成一种让人耳目一新的技术。而在中国其实从不缺乏技术人才，而是缺乏技术的想象力，只有我们将已有的技术进行大胆的想象和组合，就能让我们的技术流行起来，让别人追赶我们的思维，而不是我们一直再用双手追赶别人的思维，这样是永远赶不上的。</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">木小草</span>
+</div>
+<div>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+<span id="busuanzi_container_site_uv">
+  本站访客数<span id="busuanzi_value_site_uv"></span>人次
+</span>
+</div>
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"muxiaocao"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("n0ekDjstRAfmvxAbvhQfQGCv-gzGzoHsz", "qg1MGh57NY3eWBJfnAdltsRm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
