@@ -99,6 +99,7 @@ hexo s
 	hexo n "name of the new post"
 
 > 回车后，在source文件夹下的_post文件夹下，可以看到新建了一个name of the new post.md的文件，打开填写文件头信息
+
 ![](http://i.imgur.com/5jtBn7m.png)
 
 > 可以给文章贴上相应的tags，如有多个则按照如下格式
@@ -111,6 +112,7 @@ hexo s
 	hexo g -d
 
 > 即可生成新网站，并且同步Github上的网站内容。
+
 
 -------------------------------------------
 >**注意**：转载请标明，转自[itboy-木小草](http://muxiaocao.cn)。
