@@ -1,0 +1,904 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="UML,类设计" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/blogICO.png?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="概述
+“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        
+
+对于初学者来说，我们不仅仅是要学会面向对象的封装">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统架构设计——类的设计（UML）">
+<meta property="og:url" content="http://yoursite.com/2016/05/01/类的设计(UML)/index.html">
+<meta property="og:site_name" content="ITBoy | 木小草">
+<meta property="og:description" content="概述
+“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        
+
+对于初学者来说，我们不仅仅是要学会面向对象的封装">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501142107696">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501142402462">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501143153622">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501143830688">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501150653010">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501152027500">
+<meta property="og:image" content="http://img.blog.csdn.net/20160501152857629">
+<meta property="og:updated_time" content="2016-08-29T02:02:05.680Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="系统架构设计——类的设计（UML）">
+<meta name="twitter:description" content="概述
+“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        
+
+对于初学者来说，我们不仅仅是要学会面向对象的封装">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20160501142107696">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/05/01/类的设计(UML)/"/>
+
+  <title> 系统架构设计——类的设计（UML） | ITBoy | 木小草 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?5fdf6a8183b8779743368e6228b4ceec";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=58122117";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+    <div class="site-meta-headline">
+      <a>
+        <img class="custom-logo-image" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/avatar1.png"
+             alt="ITBoy | 木小草"/>
+      </a>
+    </div>
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">ITBoy | 木小草</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">求知若饥，虚心若愚。（Stay hungry. Stay foolish.）</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                系统架构设计——类的设计（UML）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-01T00:00:00+08:00" content="2016-05-01">
+              2016-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/系统架构设计/" itemprop="url" rel="index">
+                    <span itemprop="name">系统架构设计</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/01/类的设计(UML)/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/01/类的设计(UML)/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+	
+          
+          
+             <span id="/2016/05/01/类的设计(UML)/" class="leancloud_visitors" data-flag-title="系统架构设计——类的设计（UML）">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><blockquote>
+<p>“编程是一门技术，更加是一门艺术，不能只满足于写完代码运行结果正确久完事，时常考虑如何让代码更加简练，更加容易维护，容易扩展和服用，只有这样才可以真正得到提高。写出优雅的代码真的是一种很爽的事情。UML类图也不是一学就会的，需要有一个慢慢熟练的过程。所谓学无止境，其实这(类的设计)才是理解面向对象的开始。” ——大话设计模式        </p>
+</blockquote>
+<p>对于初学者来说，我们不仅仅是要学会面向对象的封装、继承和多态，我们更应该在理解的基础上把这些思想运用到我们的编码当中。在我学习过JAVA过后的很长一段时间，很少真正思考过，类与类之间除了继承、实现和隶属（包含）的关系还有哪些。而当我碰到问题的时候再去思考如何更改类的设计。所以在我们开始整个项目之前，我们应该尽可能的想好每一个类该如何去设计，类与类该如何处理他们的关系，这样我们再进行模式和业务设计的时候才不至于遇到问题了再重新思考。这也是实现代码复用，实现高内聚低耦合的必要条件。</p>
+<p><strong>下面我们从UML的类图出发，学习一下类的设计</strong></p>
+<h3 id="1-类-class"><a href="#1-类-class" class="headerlink" title="1. 类(class)"></a>1. 类(class)</h3><blockquote>
+<p>在我看来，类可以看做面向对象程序设计的单位，是封装、继承和多态的最小元素。在面向对象的思想中，一切万物皆对象。<br>在UML中类图分三层，第一层显示类的名称，如果是抽象类，则就用斜体显示。第二层是类的特性，通常就是字段和属性。第三层是类的操作，通常是方法和行为。<br>其中，“＋”表示public，“－”表示private，“#”表示protected。<br><img src="http://img.blog.csdn.net/20160501142107696" alt="这里写图片描述"></p>
+</blockquote>
+<h3 id="2-继承-extend"><a href="#2-继承-extend" class="headerlink" title="2. 继承(extend)"></a>2. 继承(extend)</h3><blockquote>
+<p>这是面向对象程序设计的三大特性之一。在UML中使用三角形和实线来表示的。<br><img src="http://img.blog.csdn.net/20160501142402462" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public class Bird extend Animal</div><div class="line">&#123;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="3-实现-implements"><a href="#3-实现-implements" class="headerlink" title="3. 实现(implements)"></a>3. 实现(implements)</h3><blockquote>
+<p>Java接口是一系列方法的声明，是一些方法特征的集合，一个接口只有方法的特征没有方法的实现，因此这些方法可以在不同的地方被不同的类实现，而这些实现可以具有不同的行为（功能）。<br><img src="http://img.blog.csdn.net/20160501143153622" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">public class Bird extend Animal implements Flyable</div><div class="line">&#123;</div><div class="line">	public void fly()&#123;</div><div class="line">		...</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public interface Flyable</div><div class="line">&#123;</div><div class="line">	public abstract void fly();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="4-依赖-Dependency"><a href="#4-依赖-Dependency" class="headerlink" title="4. 依赖(Dependency)"></a>4. 依赖(Dependency)</h3><blockquote>
+<p>依赖可以按照必要条件来理解，简单地理解就是<strong>依存的关系</strong>，但不是相互依存。一般此关系表示在构造方法中，以参数的形式传入。这就表达了如果没有参数，那么也就无从构造的依存关系。<br><img src="http://img.blog.csdn.net/20160501143830688" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class Animal</div><div class="line">&#123;</div><div class="line">	private Oxygen oxygen = null;</div><div class="line">	private Water water = null;</div><div class="line">	public Animal(Oxygen o,Water w)&#123;</div><div class="line">		this.oxygen = o;</div><div class="line">		this.water = w;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="5-组合-Composition"><a href="#5-组合-Composition" class="headerlink" title="5. 组合(Composition)"></a>5. 组合(Composition)</h3><blockquote>
+<p>组合关系也是一种强的”拥有”关系，与依赖不同的是，组合中的组件是可以是由自身创建的。按前面的例子来说，<strong>依赖关系的两者其实是独立产生的，只是一方的存在依赖于另一方</strong>。而<strong>组合中的双方，是一方拥有另一方，体现了严格的部分和整体的关系，部分和整体的生命周期一致</strong>。<br><img src="http://img.blog.csdn.net/20160501150653010" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">public class Bird</div><div class="line">&#123;</div><div class="line">	private Wing wing;</div><div class="line">	public Bird()&#123;</div><div class="line">		wing = new Wing();</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">public class Wing</div><div class="line">&#123;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="6-聚合-Aggregation"><a href="#6-聚合-Aggregation" class="headerlink" title="6. 聚合(Aggregation)"></a>6. 聚合(Aggregation)</h3><blockquote>
+<p>聚合表示一种弱的“拥有”关系，体现的是A对象可以包含B对象，但B对象不是A对象的一部分。<strong>相比于上面的组成关系，区别在于组成关系的组件的生命周期与整体是相同的</strong>，如果鸟死了，那么他的翅膀也就不能用了(如果你认为死去鸟的翅膀还可以移植到别的鸟身上继续使用，那么鸟和翅膀其实就是聚合关系，具体的解释稍后再说)。而<strong>聚合关系中的整体和部分是相对弱化的，就像鸟群是有鸟组成的，如果没有鸟群，鸟还是鸟</strong>。<br><img src="http://img.blog.csdn.net/20160501152027500" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class Bery</div><div class="line">&#123;</div><div class="line">	private Bird[] arrayBirds;</div><div class="line">	public abstract void SouthwardMigration();</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="7-关联-Association"><a href="#7-关联-Association" class="headerlink" title="7. 关联(Association)"></a>7. 关联(Association)</h3><blockquote>
+<p>类与类之间的联接，它使一个类知道另一个类的属性和方法。例如如果A依赖于B，则B体现为A的全局变量。关联关系有双向关联和单向关联。双向关联：两个类都知道另一个类的公共属性和操作。单向关联：只有一个类知道另外一个类的公共属性和操作。大多数关联应该是单向的，单向关系更容易建立和维护，有助于寻找可服用的类。关联关系在所有的关系中属于最弱的关系。<br><img src="http://img.blog.csdn.net/20160501152857629" alt="这里写图片描述"><br><strong>代码表示为</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public class Bird</div><div class="line">&#123;</div><div class="line">	private Climate climate;</div><div class="line">&#125;</div><div class="line">public class Climate</div><div class="line">&#123;</div><div class="line">	private String season;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h3 id="8-关联、聚合、组合、依赖之间的关系"><a href="#8-关联、聚合、组合、依赖之间的关系" class="headerlink" title="8. 关联、聚合、组合、依赖之间的关系"></a>8. 关联、聚合、组合、依赖之间的关系</h3><blockquote>
+<p>他们各自的定义之前都说过了，这里只是想说一个问题，就是四者的关系其实都是相对的，这里拿男女关系做一个比喻，相比大家能更好的理解：</p>
+<ol>
+<li>男女关系最开始的时候，双方刚刚认识，这时候要么男方对女方有意思，要么女方对男方有意思，再或者双方都有好感，那么双方的关系就是关联关系，只是单纯的把对方留意一下。这就是关联关系，只是一方知道另一方。</li>
+<li>通常来说，我们的异性朋友不止一个，即便是男方对女方有意思，女方也是男方众多异性朋友中的一个，女方亦然。这些异性朋友其实就是一个聚合。所以，如果站在女方的角度，她和男方是关联的关系，如果站在异性朋友的角度，女方只是男方的异性朋友之一，女方和异性朋友就是聚合关系。这也就说明了，关系其实都是相对的。</li>
+<li>接下来，双方结果相恋、相爱，最后走入婚姻的殿堂，组成了他们的家庭。这时候站在家庭的角度，他们和家庭之间就是一种组合关系。值得注意的是，如果家庭破裂了，丈夫和妻子的角色也就不存在了。严格体现了整体和部分的关系，生命周期是一样的。</li>
+<li>家庭的维持是需要收入来源的，一般来说，男方是这个家庭的顶梁柱，那么家庭相对于男方的关系就是依赖关系。而家庭破裂了，男方一样有经济来源，所以二者的生命周期是不一样的。</li>
+</ol>
+</blockquote>
+<h2 id="至此，我们就要进入下一阶段的学习了——设计模式。"><a href="#至此，我们就要进入下一阶段的学习了——设计模式。" class="headerlink" title="至此，我们就要进入下一阶段的学习了——设计模式。"></a>至此，我们就要进入下一阶段的学习了——设计模式。</h2><blockquote>
+<p><strong>注意</strong>：转载请标明，转自<a href="http://muxiaocao.cn" target="_blank" rel="external">itboy-木小草</a>。<br><strong>尊重原创，尊重技术。</strong></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/%E5%BE%AE%E4%BF%A1.png" alt="木小草 WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/%E6%94%AF%E4%BB%98%E5%AE%9D.jpg" alt="木小草 Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/UML/" rel="tag">#UML</a>
+          
+            <a href="/tags/类设计/" rel="tag">#类设计</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/03/大数据——Hadoop中的RPC/" rel="next" title="大数据——Hadoop中的RPC">
+                <i class="fa fa-chevron-left"></i> 大数据——Hadoop中的RPC
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/05/16/设计模式之代理模式（二）CGLIB动态代理实现/" rel="prev" title="设计模式之代理模式（二）CGLIB动态代理实现">
+                设计模式之代理模式（二）CGLIB动态代理实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/05/01/类的设计(UML)/"
+           data-title="系统架构设计——类的设计（UML）" data-url="http://yoursite.com/2016/05/01/类的设计(UML)/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://muxiaocao01.oss-cn-shenzhen.aliyuncs.com/blog/avatar.png"
+               alt="木小草" />
+          <p class="site-author-name" itemprop="name">木小草</p>
+          <p class="site-description motion-element" itemprop="description">Java Linux 算法 架构</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MuXiaoCao" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/3128404817/profile?topnav=1&wvr=6&is_all=1" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              个人链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://muxiaocao.cn/me" title="我的个人主页" target="_blank">我的个人主页</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://muqiangwei.cn" title="她的个人主页" target="_blank">她的个人主页</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-类-class"><span class="nav-number">2.</span> <span class="nav-text">1. 类(class)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-继承-extend"><span class="nav-number">3.</span> <span class="nav-text">2. 继承(extend)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-实现-implements"><span class="nav-number">4.</span> <span class="nav-text">3. 实现(implements)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-依赖-Dependency"><span class="nav-number">5.</span> <span class="nav-text">4. 依赖(Dependency)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-组合-Composition"><span class="nav-number">6.</span> <span class="nav-text">5. 组合(Composition)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-聚合-Aggregation"><span class="nav-number">7.</span> <span class="nav-text">6. 聚合(Aggregation)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-关联-Association"><span class="nav-number">8.</span> <span class="nav-text">7. 关联(Association)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-关联、聚合、组合、依赖之间的关系"><span class="nav-number">9.</span> <span class="nav-text">8. 关联、聚合、组合、依赖之间的关系</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#至此，我们就要进入下一阶段的学习了——设计模式。"><span class="nav-number"></span> <span class="nav-text">至此，我们就要进入下一阶段的学习了——设计模式。</span></a></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">木小草</span>
+</div>
+<div>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+<span id="busuanzi_container_site_uv">
+  本站访客数<span id="busuanzi_value_site_uv"></span>人次
+</span>
+</div>
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"muxiaocao"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("n0ekDjstRAfmvxAbvhQfQGCv-gzGzoHsz", "qg1MGh57NY3eWBJfnAdltsRm");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
